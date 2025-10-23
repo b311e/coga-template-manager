@@ -1,0 +1,1 @@
+# coga-template-manager
