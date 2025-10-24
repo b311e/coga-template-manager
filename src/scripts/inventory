@@ -1,0 +1,179 @@
+#!/usr/bin/env bash
+# Template Inventory Generator
+# Usage: inventory generate | inventory help
+
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+PROJECT_ROOT="$(cd "$SCRIPT_DIR/../.." && pwd)"
+
+generate_inventory() {
+    local timestamp=$(date -u +"%Y-%m-%d")
+    local output_file="$PROJECT_ROOT/docs/template-inventory.md"
+    local registry_file="$PROJECT_ROOT/.coga/registry/agencies.json"
+    
+    echo "Generating template inventory..."
+    echo "Output: $output_file"
+    echo "Timestamp: $timestamp"
+    
+    # Start the markdown file
+    cat > "$output_file" << EOF
+# Template Inventory & Status
+
+Generated: $timestamp
+
+EOF
+    
+    # Check if registry exists
+    if [[ ! -f "$registry_file" ]]; then
+        echo "Error: Registry file not found: $registry_file"
+        return 1
+    fi
+    
+    # Get agencies from registry (requires jq for JSON parsing)
+    if command -v jq >/dev/null 2>&1; then
+        generate_with_jq "$output_file" "$registry_file"
+    else
+        generate_without_jq "$output_file" "$registry_file"
+    fi
+    
+    echo "✓ Template inventory generated: $output_file"
+}
+
+generate_with_jq() {
+    local output_file="$1"
+    local registry_file="$2"
+    
+    # Parse agencies using jq preserving the original order from the JSON
+    jq -r '.agencies | to_entries | map(select(.key)) | .[] | "\(.key)|\(.value.name)|\(.value.active)"' "$registry_file" | while IFS='|' read -r agency_code agency_name active; do
+        add_agency_section "$output_file" "$agency_code" "$agency_name" "$active"
+    done
+}
+
+generate_without_jq() {
+    local output_file="$1"
+    local registry_file="$2"
+    
+    echo "Warning: jq not found, using basic parsing"
+    
+    # Basic parsing without jq - add agencies in the correct order as defined in registry
+    add_agency_section "$output_file" "jbc" "Joint Budget Committee" "true"
+    add_agency_section "$output_file" "sen" "Senate" "false"
+    add_agency_section "$output_file" "hou" "House of Representatives" "false"
+    add_agency_section "$output_file" "lcs" "Legislative Council Staff" "false"
+    add_agency_section "$output_file" "olls" "Office of Legislative Legal Services" "false"
+    add_agency_section "$output_file" "osa" "Office of the State Auditor" "false"
+}
+
+add_agency_section() {
+    local output_file="$1"
+    local agency_code="$2"
+    local agency_name="$3"
+    local active="$4"
+    
+    echo "## $agency_name" >> "$output_file"
+    echo "" >> "$output_file"
+    echo "| Template Name   | Status   |" >> "$output_file"
+    echo "|-----------------|----------|" >> "$output_file"
+    local manifest_file="$PROJECT_ROOT/builds/$agency_code/manifest.json"
+    if [[ "$active" == "true" && -f "$manifest_file" ]]; then
+        extract_templates "$output_file" "$manifest_file" "$agency_code"
+    else
+        echo "| No templates defined | - |" >> "$output_file"
+    fi
+    echo "" >> "$output_file"
+}
+
+extract_templates() {
+    local output_file="$1"
+    local manifest_file="$2"
+    local agency_code="$3"
+    
+    local found_templates=false
+    if command -v jq >/dev/null 2>&1; then
+        while IFS='|' read -r template_name status; do
+            if [[ -n "$template_name" ]]; then
+                echo "| $template_name | $status |" >> "$output_file"
+                found_templates=true
+            fi
+        done < <(jq -r '.workspace.templates // {} | to_entries[] | "\(.key)|\(.value.status)"' "$manifest_file" 2>/dev/null)
+        while IFS='|' read -r template_name status; do
+            if [[ -n "$template_name" ]]; then
+                echo "| $template_name | $status |" >> "$output_file"
+                found_templates=true
+            fi
+        done < <(jq -r '.templates.templates // {} | to_entries[] | "\(.key)|\(.value.status)"' "$manifest_file" 2>/dev/null)
+    else
+        extract_templates_basic "$output_file" "$manifest_file"
+        found_templates=true
+    fi
+    if [[ "$found_templates" == "false" ]]; then
+        echo "| No templates defined | - |" >> "$output_file"
+    fi
+}
+
+extract_templates_basic() {
+    local output_file="$1"
+    local manifest_file="$2"
+    
+    # Basic parsing - look for template patterns in both workspace and templates sections
+    grep -A 1000 '"workspace"' "$manifest_file" | grep -B 1000 '"templates"' | grep '"status"' | while read -r line; do
+        if [[ "$line" =~ \"([^\"]+)\":[[:space:]]*\{ ]]; then
+            local template_name="${BASH_REMATCH[1]}"
+            if [[ "$template_name" != "templates" && "$template_name" != "workspace" ]]; then
+                echo "- $template_name -- active" >> "$output_file"
+            fi
+        fi
+    done
+    
+    grep -A 1000 '"templates":' "$manifest_file" | grep '"status"' | while read -r line; do
+        local template_name=$(echo "$line" | grep -B 5 '"status"' | grep '"[^"]*":' | tail -1 | sed 's/.*"\([^"]*\)".*/\1/')
+        if [[ -n "$template_name" && "$template_name" != "templates" ]]; then
+            local status=$(echo "$line" | sed 's/.*"status":[[:space:]]*"\([^"]*\)".*/\1/')
+            echo "- $template_name -- $status" >> "$output_file"
+        fi
+    done
+}
+
+extract_status_from_template() {
+    local manifest_file="$1"
+    local template_name="$2"
+    
+    # Look for the status line after the template name
+    local status=$(grep -A 10 "\"$template_name\":" "$manifest_file" | grep '"status"' | head -1 | sed 's/.*"status":[[:space:]]*"\([^"]*\)".*/\1/')
+    
+    if [[ -n "$status" ]]; then
+        echo "$status"
+    else
+        echo "unknown"
+    fi
+}
+
+show_help() {
+    echo "Template Inventory Generator"
+    echo ""
+    echo "Usage: inventory <command>"
+    echo ""
+    echo "Commands:"
+    echo "  generate    Generate template inventory markdown file"
+    echo "  help        Show this help message"
+    echo ""
+    echo "Output:"
+    echo "  docs/template-inventory.md"
+    echo ""
+    echo "Examples:"
+    echo "  inventory generate"
+    echo ""
+    echo "Note: Requires jq for advanced JSON parsing (optional)"
+}
+
+case "$1" in
+    generate)
+        generate_inventory
+        ;;
+    help|--help|-h)
+        show_help
+        ;;
+    *)
+        echo "Usage: inventory <command>"
+        echo "Run 'inventory help' for more information"
+        ;;
+esac

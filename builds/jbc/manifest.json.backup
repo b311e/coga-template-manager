@@ -1,0 +1,90 @@
+{
+  "agency": "jbc",
+  "agency_name": "Joint Budget Committee",
+  "manifest_version": "1.0",
+  "generated": "2025-10-24T07:12:43Z",
+  "workspace": {
+    "category": "workspace",
+    "description": "Office workspace templates and components",
+    "templates": {
+      "jbcBook": {
+        "name": "JBC Excel Book Template",
+        "type": "excel-book-template",
+        "extension": ".xltx",
+        "src": "builds/jbc/workspace/jbcBook/src/Book.xltx",
+        "out": "builds/jbc/workspace/jbcBook/out/Book.xltx",
+        "expanded": "builds/jbc/workspace/jbcBook/in/",
+        "docs": "builds/jbc/workspace/jbcBook/docs/",
+        "status": "planned"
+      },
+      "jbcSheet": {
+        "name": "JBC Excel Sheet Template", 
+        "type": "excel-sheet-template",
+        "extension": ".xltx",
+        "src": "builds/jbc/workspace/jbcSheet/src/Sheet.xltx",
+        "out": "builds/jbc/workspace/jbcSheet/out/Sheet.xltx",
+        "expanded": "builds/jbc/workspace/jbcSheet/in/",
+        "docs": "builds/jbc/workspace/jbcSheet/docs/",
+        "status": "active"
+      },
+      "jbcNormal": {
+        "name": "JBC Word Normal Template",
+        "type": "word-doc-template", 
+        "extension": ".dotm",
+        "src": "builds/jbc/workspace/jbcNormal/src/Normal.dotm",
+        "out": "builds/jbc/workspace/jbcNormal/out/Normal.dotm",
+        "expanded": "builds/jbc/workspace/jbcNormal/in/",
+        "docs": "builds/jbc/workspace/jbcNormal/docs/",
+        "status": "active"
+      }
+    }
+  },
+  "templates": {
+    "category": "templates",
+    "description": "Document templates for specific use cases",
+    "templates": {
+      "jbcLetterhead": {
+        "name": "JBC Letterhead Template",
+        "type": "word-doc-template",
+        "extension": ".dotx",
+        "docs": "builds/jbc/templates/jbcLetterhead/docs/",
+        "status": "planned"
+      },
+      "jbcMemo": {
+        "name": "JBC Memo Template",
+        "type": "word-doc-template", 
+        "extension": ".dotx",
+        "docs": "builds/jbc/templates/jbcMemo/docs/",
+        "status": "planned"
+      }
+    }
+  },
+  "system": {
+    "category": "system",
+    "description": "Deployment and automation scripts",
+    "scripts": {
+      "jbcWorkspaceInstall": {
+        "name": "JBC Workspace Install Script",
+        "type": "deployment",
+        "file": "builds/jbc/system/jbcWorkspaceInstall.bat",
+        "target": "end-user-install",
+        "status": "active"
+      }
+    }
+  },
+  "assets": {
+    "category": "assets",
+    "description": "Themes, fonts, colors, and other resources",
+    "deployment": {
+      "workspace_dist": "dist/jbc/jbcWorkspace/",
+      "components": {
+        "jbcNormal": "dist/jbc/jbcWorkspace/jbcNormal/",
+        "jbcFonts": "dist/jbc/jbcWorkspace/jbcFonts/", 
+        "jbcColors": "dist/jbc/jbcWorkspace/jbcColors/",
+        "jbcTheme": "dist/jbc/jbcWorkspace/jbcTheme/",
+        "jbcOfficeUI": "dist/jbc/jbcWorkspace/jbcOfficeUI/",
+        "jbcXLSTART": "dist/jbc/jbcWorkspace/jbcXLSTART/"
+      }
+    }
+  }
+}

@@ -1,0 +1,167 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "COGA Template Manager Manifest Schema",
+  "version": "1.0",
+  "description": "Schema for template manifests in the COGA Template Manager system",
+  
+  "definitions": {
+    "template_types": {
+      "enum": [
+        "excel-book-template",
+        "excel-sheet-template", 
+        "excel-book",
+        "word-doc-template",
+        "word-doc"
+      ]
+    },
+    
+    "status_values": {
+      "enum": [
+        "active",
+        "planned", 
+        "deprecated",
+        "testing"
+      ]
+    },
+    
+    "categories": {
+      "enum": [
+        "workspace",
+        "templates",
+        "system", 
+        "assets"
+      ]
+    },
+    
+    "template_entry": {
+      "type": "object",
+      "required": ["name", "type", "extension", "status"],
+      "properties": {
+        "name": {
+          "type": "string",
+          "description": "Human-readable name of the template"
+        },
+        "type": {
+          "$ref": "#/definitions/template_types"
+        },
+        "extension": {
+          "type": "string",
+          "pattern": "^\\.(xltx|dotx|dotm|xlsx|docx)$"
+        },
+        "src": {
+          "type": "string", 
+          "description": "Path to source template file"
+        },
+        "out": {
+          "type": "string",
+          "description": "Path to output template file"
+        },
+        "in": {
+          "type": "string",
+          "description": "Path to expanded/unpacked template directory"
+        },
+        "docs": {
+          "type": "string",
+          "description": "Path to documentation directory"
+        },
+        "status": {
+          "$ref": "#/definitions/status_values"
+        }
+      }
+    }
+  },
+  
+  "type": "object",
+  "required": ["agency", "agency_name", "manifest_version", "generated"],
+  "properties": {
+    "agency": {
+      "type": "string",
+      "pattern": "^[a-z]+$",
+      "description": "Agency code (lowercase)"
+    },
+    "agency_name": {
+      "type": "string",
+      "description": "Full agency name"
+    },
+    "manifest_version": {
+      "type": "string",
+      "pattern": "^\\d+\\.\\d+$"
+    },
+    "generated": {
+      "type": "string",
+      "format": "date-time",
+      "description": "ISO 8601 timestamp of manifest generation"
+    },
+    "workspace": {
+      "type": "object",
+      "properties": {
+        "category": {"const": "workspace"},
+        "description": {"type": "string"},
+        "templates": {
+          "type": "object",
+          "patternProperties": {
+            "^[a-zA-Z][a-zA-Z0-9]*$": {
+              "$ref": "#/definitions/template_entry"
+            }
+          }
+        }
+      }
+    },
+    "templates": {
+      "type": "object", 
+      "properties": {
+        "category": {"const": "templates"},
+        "description": {"type": "string"},
+        "templates": {
+          "type": "object",
+          "patternProperties": {
+            "^[a-zA-Z][a-zA-Z0-9]*$": {
+              "$ref": "#/definitions/template_entry"
+            }
+          }
+        }
+      }
+    },
+    "system": {
+      "type": "object",
+      "properties": {
+        "category": {"const": "system"},
+        "description": {"type": "string"},
+        "scripts": {
+          "type": "object",
+          "patternProperties": {
+            "^[a-zA-Z][a-zA-Z0-9]*$": {
+              "type": "object",
+              "properties": {
+                "name": {"type": "string"},
+                "type": {"type": "string"},
+                "file": {"type": "string"},
+                "target": {"type": "string"},
+                "status": {"$ref": "#/definitions/status_values"}
+              }
+            }
+          }
+        }
+      }
+    },
+    "assets": {
+      "type": "object",
+      "properties": {
+        "category": {"const": "assets"},
+        "description": {"type": "string"},
+        "deployment": {
+          "type": "object",
+          "properties": {
+            "workspace_dist": {"type": "string"},
+            "components": {
+              "type": "object",
+              "patternProperties": {
+                "^[a-zA-Z][a-zA-Z0-9]*$": {"type": "string"}
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}

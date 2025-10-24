@@ -1,0 +1,214 @@
+#!/usr/bin/env bash
+# Manifest Generator for COGA Template Manager
+# Usage: manifest generate [agency] | manifest validate | manifest list
+
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+PROJECT_ROOT="$(cd "$SCRIPT_DIR/../.." && pwd)"
+
+generate_manifest() {
+    local agency="$1"
+    local timestamp=$(date -u +"%Y-%m-%dT%H:%M:%SZ")
+    
+    if [[ -z "$agency" ]]; then
+        echo "Usage: manifest generate <agency>"
+        echo "Available agencies: jbc, sen"
+        return 1
+    fi
+    
+    local agency_dir="$PROJECT_ROOT/builds/$agency"
+    local manifest_file="$agency_dir/manifest.json"
+    
+    if [[ ! -d "$agency_dir" ]]; then
+        echo "Error: Agency directory not found: $agency_dir"
+        return 1
+    fi
+    
+    echo "Generating manifest for agency: $agency"
+    echo "Scanning directory: $agency_dir"
+    echo "Updating timestamp: $timestamp"
+    
+    # Update the generated timestamp in existing manifest
+    if [[ -f "$manifest_file" ]]; then
+        # Use sed to update the timestamp
+        sed -i "s/\"generated\": \"[^\"]*\"/\"generated\": \"$timestamp\"/" "$manifest_file"
+        echo "✓ Updated timestamp in existing manifest"
+    else
+        echo "✗ Manifest file not found: $manifest_file"
+        echo "   Create one manually or copy from another agency"
+        return 1
+    fi
+    
+    # Scan for templates and report findings
+    echo ""
+    echo "Template Discovery:"
+    find "$agency_dir" -name "*.xltx" -o -name "*.dotx" -o -name "*.dotm" | while read -r template; do
+        local rel_path="${template#$PROJECT_ROOT/}"
+        echo "  Found: $rel_path"
+    done
+    
+    echo ""
+    echo "✓ Manifest updated: $manifest_file"
+    echo "  Manual updates may be needed for new templates"
+}
+
+update_template_status() {
+    local agency="$1"
+    local template="$2" 
+    local status="$3"
+    
+    if [[ -z "$agency" || -z "$template" || -z "$status" ]]; then
+        echo "Usage: manifest update-status <agency> <template> <status>"
+        echo "Status options: active, planned, deprecated, testing"
+        return 1
+    fi
+    
+    local manifest_file="$PROJECT_ROOT/builds/$agency/manifest.json"
+    
+    if [[ ! -f "$manifest_file" ]]; then
+        echo "Error: Manifest not found: $manifest_file"
+        return 1
+    fi
+    
+    # Create backup
+    cp "$manifest_file" "$manifest_file.backup"
+    
+    # Use sed to update the status
+    sed -i "/$template/,/status/s/\"status\": \"[^\"]*\"/\"status\": \"$status\"/" "$manifest_file"
+    
+    echo "✓ Updated $template status to '$status' in $agency manifest"
+    echo "✓ Backup created: $manifest_file.backup"
+}
+
+add_new_template() {
+    local agency="$1"
+    local template="$2"
+    local type="$3"
+    
+    if [[ -z "$agency" || -z "$template" || -z "$type" ]]; then
+        echo "Usage: manifest add-template <agency> <template> <type>"
+        echo "Types: excel-book-template, excel-sheet-template, word-doc-template"
+        return 1
+    fi
+    
+    echo "To add a new template '$template' to agency '$agency':"
+    echo "1. Edit builds/$agency/manifest.json"
+    echo "2. Add template entry in appropriate category"
+    echo "3. Run: manifest generate $agency"
+    echo ""
+    echo "Template structure needed:"
+    echo "  builds/$agency/workspace/$template/src/"
+    echo "  builds/$agency/workspace/$template/out/" 
+    echo "  builds/$agency/workspace/$template/in/"
+    echo "  builds/$agency/workspace/$template/docs/"
+}
+
+validate_manifest() {
+    echo "Validating all manifests..."
+    
+    # Check global registry
+    local registry="$PROJECT_ROOT/.coga/registry/agencies.json"
+    if [[ -f "$registry" ]]; then
+        echo "✓ Global registry found: $registry"
+    else
+        echo "✗ Global registry missing: $registry"
+    fi
+    
+    # Check agency manifests
+    for agency_dir in "$PROJECT_ROOT/builds"/*; do
+        if [[ -d "$agency_dir" ]]; then
+            local agency=$(basename "$agency_dir")
+            local manifest="$agency_dir/manifest.json"
+            
+            if [[ -f "$manifest" ]]; then
+                echo "✓ Agency manifest found: $agency -> $manifest"
+            else
+                echo "✗ Agency manifest missing: $agency -> $manifest"
+            fi
+        fi
+    done
+}
+
+list_templates() {
+    echo "Template Registry:"
+    echo "=================="
+    
+    for agency_dir in "$PROJECT_ROOT/builds"/*; do
+        if [[ -d "$agency_dir" ]]; then
+            local agency=$(basename "$agency_dir")
+            echo ""
+            echo "Agency: $agency"
+            echo "-------"
+            
+            # List workspace templates
+            if [[ -d "$agency_dir/workspace" ]]; then
+                echo "Workspace Templates:"
+                for template_dir in "$agency_dir/workspace"/*; do
+                    if [[ -d "$template_dir" ]]; then
+                        local template_name=$(basename "$template_dir")
+                        echo "  - $template_name"
+                        
+                        # Check for source files
+                        if [[ -d "$template_dir/src" ]]; then
+                            find "$template_dir/src" -name "*.xltx" -o -name "*.dotx" -o -name "*.dotm" | while read -r file; do
+                                echo "    src: $(basename "$file")"
+                            done
+                        fi
+                        
+                        # Check for output files  
+                        if [[ -d "$template_dir/out" ]]; then
+                            find "$template_dir/out" -name "*.xltx" -o -name "*.dotx" -o -name "*.dotm" | while read -r file; do
+                                echo "    out: $(basename "$file")"
+                            done
+                        fi
+                    fi
+                done
+            fi
+            
+            # List document templates
+            if [[ -d "$agency_dir/templates" ]]; then
+                echo "Document Templates:"
+                for template_dir in "$agency_dir/templates"/*; do
+                    if [[ -d "$template_dir" ]]; then
+                        local template_name=$(basename "$template_dir")
+                        echo "  - $template_name"
+                    fi
+                done
+            fi
+        fi
+    done
+}
+
+case "$1" in
+    generate)
+        generate_manifest "$2"
+        ;;
+    update-status)
+        update_template_status "$2" "$3" "$4"
+        ;;
+    add-template)
+        add_new_template "$2" "$3" "$4"
+        ;;
+    validate)
+        validate_manifest
+        ;;
+    list)
+        list_templates
+        ;;
+    *)
+        echo "Usage: manifest <command> [options]"
+        echo ""
+        echo "Commands:"
+        echo "  generate <agency>              - Update manifest timestamp and scan for templates"
+        echo "  update-status <agency> <template> <status> - Update template status"
+        echo "  add-template <agency> <template> <type>    - Guide for adding new template"
+        echo "  validate                       - Validate all manifests"
+        echo "  list                          - List all templates"
+        echo ""
+        echo "Examples:"
+        echo "  manifest generate jbc"
+        echo "  manifest update-status jbc jbcNormal active"
+        echo "  manifest add-template jbc jbcReport excel-book-template"
+        echo "  manifest validate"
+        echo "  manifest list"
+        ;;
+esac

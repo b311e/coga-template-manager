@@ -1,0 +1,48 @@
+{
+  "manifest_version": "1.0",
+  "generated": "2025-10-24T00:00:00Z",
+  "agencies": {
+    "hou": {
+      "name": "House of Representatives",
+      "code": "HOU",
+      "manifest_path": "builds/hou/manifest.json",
+      "categories": ["workspace", "templates", "system"],
+      "active": false
+    },
+    "sen": {
+      "name": "Senate",
+      "code": "SEN",
+      "manifest_path": "builds/sen/manifest.json", 
+      "categories": ["workspace", "templates", "system"],
+      "active": false
+    },
+    "jbc": {
+      "name": "Joint Budget Committee",
+      "code": "JBC", 
+      "manifest_path": "builds/jbc/manifest.json",
+      "categories": ["workspace", "templates", "system", "assets"],
+      "active": true
+    },
+    "lcs": {
+      "name": "Legislative Council Staff",
+      "code": "LCS",
+      "manifest_path": "builds/lcs/manifest.json",
+      "categories": ["workspace", "templates", "system"],
+      "active": false
+    },
+    "olls": {
+      "name": "Office of Legislative Legal Services",
+      "code": "OLLS",
+      "manifest_path": "builds/olls/manifest.json",
+      "categories": ["workspace", "templates", "system"],
+      "active": false
+    },
+    "osa": {
+      "name": "Office of the State Auditor",
+      "code": "OSA",
+      "manifest_path": "builds/osa/manifest.json",
+      "categories": ["workspace", "templates", "system"],
+      "active": false
+    }
+  }
+}
