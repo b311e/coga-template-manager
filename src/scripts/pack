@@ -1,0 +1,58 @@
+#!/usr/bin/env bash
+# OpenXML Pack Alias
+# Usage: pack <source directory> [output file]
+# If output file is not provided, it will be auto-generated in the build folder
+
+set -euo pipefail
+
+if [ $# -lt 1 ]; then
+    echo "Usage: pack <source directory> [output file]"
+    echo "Example: pack templates/jbc/jbcNormal/source/expanded"
+    echo "Example: pack templates/jbc/jbcNormal/source/expanded build/jbcNormal.dotm"
+    exit 1
+fi
+
+# Get the script directory to find the project
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+PROJECT_ROOT="$(cd "$SCRIPT_DIR/../.." && pwd)"
+
+SOURCE_DIR="$1"
+
+# If no output file specified, auto-generate one in template's build folder
+if [ $# -eq 1 ]; then
+    # Extract template info from path (e.g., templates/jbc/jbcNormal/source/expanded)
+    if [[ "$SOURCE_DIR" =~ templates/([^/]+)/([^/]+)/source/expanded ]]; then
+        AGENCY="${BASH_REMATCH[1]}"
+        TEMPLATE="${BASH_REMATCH[2]}"
+        
+        # Determine file extension based on template name
+        if [[ "$TEMPLATE" == *"Normal"* ]]; then
+            EXT="dotm"
+        elif [[ "$TEMPLATE" == *"Sheet"* ]] || [[ "$TEMPLATE" == *"Book"* ]]; then
+            EXT="xltx"
+        else
+            EXT="dotm"  # Default to Word template
+        fi
+        
+        # Create template's build directory if it doesn't exist
+        BUILD_DIR="templates/$AGENCY/$TEMPLATE/build"
+        mkdir -p "$BUILD_DIR"
+        
+        OUTPUT_FILE="$BUILD_DIR/$TEMPLATE.$EXT"
+        echo "Auto-generating: $OUTPUT_FILE"
+    else
+        echo "Error: Cannot determine template info from path: $SOURCE_DIR"
+        echo "Please provide output file manually or use standard path format:"
+        echo "  templates/{agency}/{templateName}/source/expanded"
+        exit 1
+    fi
+else
+    OUTPUT_FILE="$2"
+    # Create directory for output file if needed
+    mkdir -p "$(dirname "$OUTPUT_FILE")"
+fi
+
+# Run the dotnet command
+dotnet run --project "$PROJECT_ROOT/src/OpenXmlApp/OpenXmlApp.csproj" pack "$SOURCE_DIR" "$OUTPUT_FILE"
+
+echo "✅ Packed: $OUTPUT_FILE"

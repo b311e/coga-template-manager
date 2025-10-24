@@ -1,0 +1,18 @@
+#!/usr/bin/env bash
+# OpenXML Unpack Alias
+# Usage: unpack <file path>
+
+set -euo pipefail
+
+if [ $# -eq 0 ]; then
+    echo "Usage: unpack <file path>"
+    echo "Example: unpack templates/jbc/jbcBook/source/Book.xltx"
+    exit 1
+fi
+
+# Get the script directory to find the project
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+PROJECT_ROOT="$(cd "$SCRIPT_DIR/../.." && pwd)"
+
+# Run the dotnet command
+dotnet run --project "$PROJECT_ROOT/src/OpenXmlApp/OpenXmlApp.csproj" unpack "$@"

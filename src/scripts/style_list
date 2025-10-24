@@ -1,0 +1,90 @@
+#!/usr/bin/env bash
+# Template Style Manager
+# Usage: ./style list <templateName>
+#        ./style list <agency/templateName>
+
+set -euo pipefail
+
+command=${1:-}
+template_name=${2:-}
+
+case "$command" in
+  list)
+    if [ -z "$template_name" ]; then
+      echo "Usage: $0 list <templateName>"
+      echo "Example: $0 list jbcNormal"
+      echo "Example: $0 list jbc/jbcNormal"
+      exit 1
+    fi
+    
+    # Core style extraction logic (merged from generate_style_list.sh)
+    template_or_path="$template_name"
+    output_file=""
+
+    if [ -f "$template_or_path" ]; then
+      styles_xml="$template_or_path"
+      template_base=$(basename "${styles_xml%/word/styles.xml}")
+    else
+      # Look for the template in the templates directory structure
+      # Format: templates/{agency}/{templateName}/source/expanded/word/styles.xml
+      if [[ "$template_or_path" == */* ]]; then
+        # If path contains slash, use as-is (e.g., "jbc/jbcNormal")
+        styles_xml="templates/${template_or_path}/source/expanded/word/styles.xml"
+      else
+        # If no slash, try to find it by searching for the template name
+        styles_xml=$(find templates -name "${template_or_path}" -type d | head -1)
+        if [ -n "$styles_xml" ]; then
+          styles_xml="${styles_xml}/source/expanded/word/styles.xml"
+        else
+          # Fallback: assume it's in jbc agency for now
+          styles_xml="templates/jbc/${template_or_path}/source/expanded/word/styles.xml"
+        fi
+      fi
+      template_base=$(basename "$template_or_path")
+    fi
+
+    template_base=${template_base%.xml}
+
+    if [ ! -f "$styles_xml" ]; then
+      echo "Error: styles XML not found at $styles_xml" >&2
+      exit 1
+    fi
+
+    if [ -z "$output_file" ]; then
+      # Determine the template directory for docs folder
+      if [[ "$template_or_path" == */* ]]; then
+        # If path contains slash (e.g., "jbc/jbcNormal")
+        template_dir="templates/${template_or_path}"
+      else
+        # If no slash, find the template directory
+        template_dir=$(find templates -name "${template_or_path}" -type d | head -1)
+        if [ -z "$template_dir" ]; then
+          # Fallback: assume it's in jbc agency
+          template_dir="templates/jbc/${template_or_path}"
+        fi
+      fi
+      
+      output_file="${template_dir}/docs/style-list-${template_base}.txt"
+    fi
+
+    mkdir -p "$(dirname "${output_file}")"
+
+    xmlstarlet sel \
+      -N w='http://schemas.openxmlformats.org/wordprocessingml/2006/main' \
+      -t -m '/w:styles/w:style' \
+      -v 'concat(position(), ": ", @w:styleId, " — ", w:name/@w:val)' \
+      -n "${styles_xml}" \
+      > "${output_file}"
+
+    printf 'Wrote %s styles to %s\n' "$(wc -l < "${output_file}")" "${output_file}"
+    ;;
+  *)
+    echo "Available commands:"
+    echo "  list <templateName>  - Generate style list for template"
+    echo ""
+    echo "Examples:"
+    echo "  $0 list jbcNormal"
+    echo "  $0 list jbc/jbcNormal"
+    exit 1
+    ;;
+esac
