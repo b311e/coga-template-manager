@@ -1,112 +1,210 @@
-﻿using System.IO;
-using System.IO.Compression;
-using System.Xml.Linq;
+using System;
+using System.IO;
+using DocumentFormat.OpenXml;
+using DocumentFormat.OpenXml.Packaging;
+using DocumentFormat.OpenXml.Wordprocessing;
+using Excel = DocumentFormat.OpenXml.Spreadsheet;
 
-class Program
+namespace OpenXmlApp
 {
-    static void Main(string[] args)
+    class Program
     {
-        if (args.Length < 1)
+        static void Main(string[] args)
+        {
+            Console.WriteLine("OpenXML Template Manager");
+            
+            if (args.Length == 0)
+            {
+                ShowUsage();
+                return;
+            }
+            
+            string command = args[0].ToLower();
+            
+            switch (command)
+            {
+                case "pack":
+                    HandlePack(args);
+                    break;
+                case "unpack":
+                    HandleUnpack(args);
+                    break;
+                case "create":
+                    HandleCreate(args);
+                    break;
+                default:
+                    Console.WriteLine($"Unknown command: {command}");
+                    ShowUsage();
+                    break;
+            }
+        }
+        
+        static void HandleCreate(string[] args)
+        {
+            if (args.Length < 2)
+            {
+                Console.WriteLine("Error: Template type required");
+                Console.WriteLine("Usage: create <type> [name]");
+                Console.WriteLine("Types: excel-book-template, excel-sheet-template, excel-book, word-doc-template, word-doc");
+                return;
+            }
+            
+            string templateType = args[1].ToLower();
+            string fileName = args.Length > 2 ? args[2] : GetDefaultFileName(templateType);
+            string outputPath = GetOutputPath(templateType, fileName);
+            
+            try
+            {
+                switch (templateType)
+                {
+                    case "excel-book-template":
+                        CreateExcelBookTemplate(outputPath);
+                        break;
+                    case "excel-sheet-template":
+                        CreateExcelSheetTemplate(outputPath);
+                        break;
+                    case "excel-book":
+                        CreateExcelBook(outputPath);
+                        break;
+                    case "word-doc-template":
+                        CreateWordDocTemplate(outputPath);
+                        break;
+                    case "word-doc":
+                        CreateWordDoc(outputPath);
+                        break;
+                    default:
+                        Console.WriteLine($"Unknown template type: {templateType}");
+                        return;
+                }
+                
+                Console.WriteLine($"Created: {outputPath}");
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error creating template: {ex.Message}");
+            }
+        }
+        
+        static void CreateExcelBookTemplate(string outputPath)
+        {
+            using (var document = SpreadsheetDocument.Create(outputPath, SpreadsheetDocumentType.Template))
+            {
+                var workbookPart = document.AddWorkbookPart();
+                workbookPart.Workbook = new Excel.Workbook();
+                
+                var worksheetPart = workbookPart.AddNewPart<WorksheetPart>();
+                worksheetPart.Worksheet = new Excel.Worksheet(new Excel.SheetData());
+                
+                var sheets = workbookPart.Workbook.AppendChild(new Excel.Sheets());
+                sheets.Append(new Excel.Sheet() 
+                { 
+                    Id = workbookPart.GetIdOfPart(worksheetPart),
+                    SheetId = 1,
+                    Name = "Sheet1"
+                });
+                
+                workbookPart.Workbook.Save();
+            }
+        }
+        
+        static void CreateExcelSheetTemplate(string outputPath)
+        {
+            CreateExcelBookTemplate(outputPath);
+        }
+        
+        static void CreateExcelBook(string outputPath)
+        {
+            using (var document = SpreadsheetDocument.Create(outputPath, SpreadsheetDocumentType.Workbook))
+            {
+                var workbookPart = document.AddWorkbookPart();
+                workbookPart.Workbook = new Excel.Workbook();
+                
+                var worksheetPart = workbookPart.AddNewPart<WorksheetPart>();
+                worksheetPart.Worksheet = new Excel.Worksheet(new Excel.SheetData());
+                
+                var sheets = workbookPart.Workbook.AppendChild(new Excel.Sheets());
+                sheets.Append(new Excel.Sheet() 
+                { 
+                    Id = workbookPart.GetIdOfPart(worksheetPart),
+                    SheetId = 1,
+                    Name = "Sheet1"
+                });
+                
+                workbookPart.Workbook.Save();
+            }
+        }
+        
+        static void CreateWordDocTemplate(string outputPath)
+        {
+            using (var document = WordprocessingDocument.Create(outputPath, WordprocessingDocumentType.Template))
+            {
+                var mainPart = document.AddMainDocumentPart();
+                mainPart.Document = new Document(new Body());
+                mainPart.Document.Save();
+            }
+        }
+        
+        static void CreateWordDoc(string outputPath)
+        {
+            using (var document = WordprocessingDocument.Create(outputPath, WordprocessingDocumentType.Document))
+            {
+                var mainPart = document.AddMainDocumentPart();
+                mainPart.Document = new Document(new Body());
+                mainPart.Document.Save();
+            }
+        }
+        
+        static string GetDefaultFileName(string templateType)
+        {
+            return templateType switch
+            {
+                "excel-book-template" => "Book",
+                "excel-sheet-template" => "Sheet", 
+                "excel-book" => "Workbook",
+                "word-doc-template" => "Normal",
+                "word-doc" => "Document",
+                _ => "Template"
+            };
+        }
+        
+        static string GetOutputPath(string templateType, string fileName)
+        {
+            string extension = templateType switch
+            {
+                "excel-book-template" => ".xltx",
+                "excel-sheet-template" => ".xltx",
+                "excel-book" => ".xlsx", 
+                "word-doc-template" => ".dotx",
+                "word-doc" => ".docx",
+                _ => ".tmp"
+            };
+            
+            return $"{fileName}{extension}";
+        }
+        
+        static void HandlePack(string[] args)
+        {
+            Console.WriteLine("Pack command not implemented yet");
+        }
+        
+        static void HandleUnpack(string[] args)
+        {
+            Console.WriteLine("Unpack command not implemented yet");
+        }
+        
+        static void ShowUsage()
         {
             Console.WriteLine("Usage:");
-            Console.WriteLine("  pack   <sourceDir> <out.dotm>");
-            Console.WriteLine("  unpack <in.dotm> [outDir]");
-            Console.WriteLine("    If outDir is omitted, creates 'expanded' folder next to input file");
-            return;
+            Console.WriteLine("  dotnet run pack <template-path>");
+            Console.WriteLine("  dotnet run unpack <template-path>");
+            Console.WriteLine("  dotnet run create <type> [name]");
+            Console.WriteLine("");
+            Console.WriteLine("Create types:");
+            Console.WriteLine("  excel-book-template   - Create Excel Book template (.xltx)");
+            Console.WriteLine("  excel-sheet-template  - Create Excel Sheet template (.xltx)");
+            Console.WriteLine("  excel-book           - Create Excel workbook (.xlsx)");
+            Console.WriteLine("  word-doc-template    - Create Word document template (.dotx)");
+            Console.WriteLine("  word-doc             - Create Word document (.docx)");
         }
-
-        switch (args[0])
-        {
-            case "pack":
-                PackDotm(args[1], args[2]);
-                break;
-            case "unpack":
-                if (args.Length >= 3)
-                {
-                    // Two arguments provided: unpack <input> <output>
-                    Unpack(args[1], args[2]);
-                }
-                else
-                {
-                    // One argument provided: auto-create "expanded" folder next to source
-                    UnpackAuto(args[1]);
-                }
-                break;
-            default:
-                Console.WriteLine("Unknown command.");
-                break;
-        }
-    }
-
-    static void PackDotm(string sourceDir, string outFile)
-    {
-        if (!Directory.Exists(sourceDir))
-            throw new DirectoryNotFoundException(sourceDir);
-
-        var types = Path.Combine(sourceDir, "[Content_Types].xml");
-        if (!File.Exists(types))
-            throw new InvalidDataException("Missing required OOXML Content_Types.xml file.");
-
-        // Determine if this is a Word or Excel document by checking for key files
-        var isWordDoc = Directory.Exists(Path.Combine(sourceDir, "word"));
-        var isExcelDoc = Directory.Exists(Path.Combine(sourceDir, "xl"));
-
-        if (!isWordDoc && !isExcelDoc)
-            throw new InvalidDataException("Neither Word nor Excel document structure found.");
-
-        // Validate content types based on document type
-        XNamespace ct = "http://schemas.openxmlformats.org/package/2006/content-types";
-        var x = XDocument.Load(types);
-        
-        if (isWordDoc)
-        {
-            var docXml = Path.Combine(sourceDir, "word", "document.xml");
-            if (!File.Exists(docXml))
-                throw new InvalidDataException("Missing required Word document.xml file.");
-                
-            bool valid = x.Root?.Elements(ct + "Override")
-                .Any(o => (string?)o.Attribute("PartName") == "/word/document.xml" &&
-                          ((string?)o.Attribute("ContentType"))?.Contains("word") == true) == true;
-            if (!valid)
-                throw new InvalidDataException("Invalid Word document content type.");
-        }
-        else if (isExcelDoc)
-        {
-            var workbookXml = Path.Combine(sourceDir, "xl", "workbook.xml");
-            if (!File.Exists(workbookXml))
-                throw new InvalidDataException("Missing required Excel workbook.xml file.");
-                
-            bool valid = x.Root?.Elements(ct + "Override")
-                .Any(o => (string?)o.Attribute("PartName") == "/xl/workbook.xml" &&
-                          ((string?)o.Attribute("ContentType"))?.Contains("spreadsheetml") == true) == true;
-            if (!valid)
-                throw new InvalidDataException("Invalid Excel document content type.");
-        }
-
-        if (File.Exists(outFile)) File.Delete(outFile);
-        ZipFile.CreateFromDirectory(sourceDir, outFile, CompressionLevel.Optimal, includeBaseDirectory: false);
-
-        Console.WriteLine($"Created {outFile}");
-    }
-
-    static void Unpack(string inFile, string outDir)
-    {
-        if (Directory.Exists(outDir)) Directory.Delete(outDir, true);
-        Directory.CreateDirectory(outDir);
-        ZipFile.ExtractToDirectory(inFile, outDir);
-        Console.WriteLine($"Extracted {inFile} to {outDir}");
-    }
-
-    static void UnpackAuto(string inFile)
-    {
-        // Create folder named after the input file (without extension) in the same directory
-        string directory = Path.GetDirectoryName(inFile) ?? throw new InvalidOperationException("Cannot determine directory");
-        string fileNameWithoutExtension = Path.GetFileNameWithoutExtension(inFile);
-        string outDir = Path.Combine(directory, fileNameWithoutExtension);
-        
-        if (Directory.Exists(outDir)) Directory.Delete(outDir, true);
-        Directory.CreateDirectory(outDir);
-        ZipFile.ExtractToDirectory(inFile, outDir);
-        Console.WriteLine($"Extracted {inFile} to {outDir}");
     }
 }

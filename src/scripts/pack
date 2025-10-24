@@ -1,14 +1,15 @@
 #!/usr/bin/env bash
 # OpenXML Pack Alias
 # Usage: pack <source directory> [output file]
-# If output file is not provided, it will be auto-generated in the build folder
+# If output file is not provided, it will be auto-generated in the out folder
 
 set -euo pipefail
 
 if [ $# -lt 1 ]; then
     echo "Usage: pack <source directory> [output file]"
-    echo "Example: pack templates/jbc/jbcNormal/source/expanded"
-    echo "Example: pack templates/jbc/jbcNormal/source/expanded build/jbcNormal.dotm"
+    echo "Example: pack builds/jbc/workspace/jbcNormal/in"
+    echo "Example: pack builds/jbc/templates/jbcMemo/in"
+    echo "Example: pack builds/jbc/workspace/jbcSheet/in builds/jbc/workspace/jbcSheet/out/CustomSheet.xltx"
     exit 1
 fi
 
@@ -18,32 +19,45 @@ PROJECT_ROOT="$(cd "$SCRIPT_DIR/../.." && pwd)"
 
 SOURCE_DIR="$1"
 
-# If no output file specified, auto-generate one in template's build folder
+# If no output file specified, auto-generate one in template's out folder
 if [ $# -eq 1 ]; then
-    # Extract template info from path (e.g., templates/jbc/jbcNormal/source/expanded)
-    if [[ "$SOURCE_DIR" =~ templates/([^/]+)/([^/]+)/source/expanded ]]; then
+    # Extract template info from path (e.g., builds/jbc/workspace/jbcNormal/in or builds/jbc/templates/jbcMemo/in)
+    if [[ "$SOURCE_DIR" =~ builds/([^/]+)/([^/]+)/([^/]+)/in ]]; then
         AGENCY="${BASH_REMATCH[1]}"
-        TEMPLATE="${BASH_REMATCH[2]}"
+        CATEGORY="${BASH_REMATCH[2]}"
+        TEMPLATE="${BASH_REMATCH[3]}"
         
-        # Determine file extension based on template name
+        # Determine file extension and name based on template type
         if [[ "$TEMPLATE" == *"Normal"* ]]; then
             EXT="dotm"
-        elif [[ "$TEMPLATE" == *"Sheet"* ]] || [[ "$TEMPLATE" == *"Book"* ]]; then
+            FILENAME="Normal.$EXT"
+        elif [[ "$TEMPLATE" == *"Sheet"* ]]; then
             EXT="xltx"
+            FILENAME="Sheet.$EXT"
+        elif [[ "$TEMPLATE" == *"Book"* ]]; then
+            EXT="xltx"
+            FILENAME="Book.$EXT"
+        elif [[ "$TEMPLATE" == *"Theme"* ]]; then
+            EXT="thmx"
+            FILENAME="${TEMPLATE}.$EXT"
+        elif [[ "$TEMPLATE" == *"Letterhead"* ]] || [[ "$TEMPLATE" == *"Memo"* ]] || [[ "$TEMPLATE" == *"Form"* ]]; then
+            EXT="dotx"
+            FILENAME="${TEMPLATE}.$EXT"
         else
-            EXT="dotm"  # Default to Word template
+            EXT="dotx"  # Default to Word template
+            FILENAME="${TEMPLATE}.$EXT"
         fi
         
-        # Create template's build directory if it doesn't exist
-        BUILD_DIR="templates/$AGENCY/$TEMPLATE/build"
-        mkdir -p "$BUILD_DIR"
+        # Create template's out directory if it doesn't exist
+        OUT_DIR="builds/$AGENCY/$CATEGORY/$TEMPLATE/out"
+        mkdir -p "$OUT_DIR"
         
-        OUTPUT_FILE="$BUILD_DIR/$TEMPLATE.$EXT"
+        OUTPUT_FILE="$OUT_DIR/$FILENAME"
         echo "Auto-generating: $OUTPUT_FILE"
     else
         echo "Error: Cannot determine template info from path: $SOURCE_DIR"
         echo "Please provide output file manually or use standard path format:"
-        echo "  templates/{agency}/{templateName}/source/expanded"
+        echo "  builds/{agency}/{category}/{templateName}/in"
         exit 1
     fi
 else
@@ -55,4 +69,4 @@ fi
 # Run the dotnet command
 dotnet run --project "$PROJECT_ROOT/src/OpenXmlApp/OpenXmlApp.csproj" pack "$SOURCE_DIR" "$OUTPUT_FILE"
 
-echo "✅ Packed: $OUTPUT_FILE"
+echo "Packed: $OUTPUT_FILE"
