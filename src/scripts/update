@@ -1,0 +1,36 @@
+#!/usr/bin/env bash
+# Dispatcher for simple update commands.
+# Usage: update manifest partials
+
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+PROJ_ROOT="$(cd "$SCRIPT_DIR/../.." && pwd)"
+
+if [[ "$1" == "manifest" ]]; then
+  case "$2" in
+    partials)
+      # forward remaining args to the partials updater
+      shift 2
+      python3 "$SCRIPT_DIR/update_partials_manifest.py" "$@"
+      exit $?
+      ;;
+    *)
+      # proxy to existing manifest script: manifest <command> [...]
+      shift 1
+      "$SCRIPT_DIR/manifest" "$@"
+      exit $?
+      ;;
+  esac
+else
+  cat <<EOF
+Usage: update <topic> <subcommand> [options]
+
+Supported topics:
+  manifest partials      - Update foundation/partials/partials-manifest.json from files
+  manifest <command>     - Proxy to the existing manifest script (generate, validate, list...)
+
+Examples:
+  update manifest partials
+  update manifest generate jbc
+EOF
+  exit 2
+fi

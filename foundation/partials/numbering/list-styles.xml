@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<snippet id="listStylesDefault" xmlns:w="http://schemas.openxmlformats.org/wordprocessingml/2006/main">
+    <w:style w:type="paragraph" w:styleId="ListBullet">
+        <w:name w:val="List Bullet" />
+        <w:basedOn w:val="ListParagraph" />
+        <w:uiPriority w:val="16" />
+        <w:qFormat />
+        <w:pPr>
+            <w:numPr>
+                <w:numId w:val="1" />
+            </w:numPr>
+            <w:contextualSpacing />
+        </w:pPr>
+    </w:style>
+    <w:style w:type="paragraph" w:styleId="ListNumber">
+        <w:name w:val="List Number" />
+        <w:basedOn w:val="ListParagraph" />
+        <w:uiPriority w:val="16" />
+        <w:qFormat />
+        <w:pPr>
+            <w:numPr>
+                <w:numId w:val="2" />
+            </w:numPr>
+            <w:contextualSpacing />
+        </w:pPr>
+    </w:style>
+    <w:style w:type="paragraph" w:customStyle="1" w:styleId="SpacingListBullet">
+        <w:name w:val="List Bullet Spacing" />
+        <w:basedOn w:val="ListBullet" />
+        <w:uiPriority w:val="16" />
+        <w:qFormat />
+        <w:pPr>
+            <w:contextualSpacing w:val="0" />
+        </w:pPr>
+    </w:style>
+    <w:style w:type="paragraph" w:customStyle="1" w:styleId="SpacingListNumber">
+        <w:name w:val="List Number Spacing" />
+        <w:basedOn w:val="ListNumber" />
+        <w:uiPriority w:val="16" />
+        <w:qFormat />
+        <w:pPr>
+            <w:contextualSpacing w:val="0" />
+        </w:pPr>
+    </w:style>
+</snippet>

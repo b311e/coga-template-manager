@@ -72,6 +72,8 @@ coga-template-manager/
 - `create <type> [name]` - Create new OpenXML templates/documents
   - Types: `excel-book-template`, `excel-sheet-template`, `excel-book`, `word-doc-template`, `word-doc`
 - `manifest <command> [options]` - Manage template manifests and registry
+ - `update manifest partials` - Rebuild `foundation/partials/partials-manifest.json` from the files in `foundation/partials/` (backs up to `partials-manifest.json.bak`)
+   - See full documentation: `docs/manifest-updater.md` (covers agency manifest helpers and the partials manifest updater)
 - `pack <expanded_folder> <output_file>` - Pack template. Will save packed file to the build folder
 - `unpack <template_file> [output_folder]` - Unpack template
 - `style_list list <templateName>` - Generate style list for template

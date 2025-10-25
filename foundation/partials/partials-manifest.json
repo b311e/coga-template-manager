@@ -1,0 +1,22 @@
+{
+  "snippets": [
+    {
+      "id": "listStylesDefault",
+      "path": "foundation/partials/numbering/list-styles.xml",
+      "target": "word:styles",
+      "tags": [
+        "styles"
+      ],
+      "status": "active"
+    },
+    {
+      "id": "numberingDefault",
+      "path": "foundation/partials/numbering/numbering.xml",
+      "target": "word:numbering",
+      "tags": [
+        "numbering"
+      ],
+      "status": "active"
+    }
+  ]
+}
