@@ -19,13 +19,23 @@ PROJECT_ROOT="$(cd "$SCRIPT_DIR/../.." && pwd)"
 
 SOURCE_DIR="$1"
 
-# If no output file specified, auto-generate one in template's out folder
+# Extract relative path from absolute path if needed
+if [[ "$SOURCE_DIR" == /* ]]; then
+    # Remove project root prefix to get relative path
+    SOURCE_DIR="${SOURCE_DIR#$PROJECT_ROOT/}"
+fi
 if [ $# -eq 1 ]; then
-    # Extract template info from path (e.g., builds/jbc/workspace/jbcNormal/in or builds/jbc/templates/jbcMemo/in)
-    if [[ "$SOURCE_DIR" =~ builds/([^/]+)/([^/]+)/([^/]+)/in ]]; then
+    # Extract template info from path (e.g., builds/jbc/workspace/jbcNormal/in or builds/core/word/in)
+    if [[ "$SOURCE_DIR" =~ builds/([^/]+)/([^/]+)/([^/]*)/?in ]]; then
         AGENCY="${BASH_REMATCH[1]}"
         CATEGORY="${BASH_REMATCH[2]}"
         TEMPLATE="${BASH_REMATCH[3]}"
+        
+        # If TEMPLATE is empty (2-level path like builds/core/word/in), use CATEGORY as template
+        if [ -z "$TEMPLATE" ]; then
+            TEMPLATE="$CATEGORY"
+            CATEGORY="templates"  # Default category
+        fi
         
         # Determine file extension and name based on template type
         if [[ "$TEMPLATE" == *"Normal"* ]]; then
