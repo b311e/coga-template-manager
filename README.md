@@ -89,7 +89,7 @@ A template management system for Microsoft Office templates, including Word (.do
 unpack <target-doc> <output-file-name>
 
 # Pack: Zips the contents into a usable office file.
-pack <expanded-file> <output-file-name>
+pack <expanded-file-in> <output-file-name-out>
 ```
 
 ### Create New Files
@@ -154,6 +154,9 @@ There are three import helpers now:
 - `style-import-map` (Python): read `docs/style-map.yml` (preferred) and import ordered styles from partial snippets into a target `styles.xml`. Auto-discovers a nearby `docs/style-map.yml` when run from a template folder and falls back to the legacy `docs/style-mapping.yml` for compatibility. Backups are opt-in with `--backup`.
 
    ```bash
+   # Import styles from partials listed under style-map
+   style-import-map <target-styles.xml>
+
    # Dry-run using auto-discovery of mapping
    style-import-map <target-styles.xml> --dry-run
 

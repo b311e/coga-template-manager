@@ -1,9 +1,69 @@
 {
   "agency": "osa",
   "manifest_version": "1.0",
-  "generated": "2025-12-19T05:49:15Z",
-  "workspace": { "category": "workspace", "templates": {} },
-  "templates": { "category": "templates", "templates": {} },
-  "system": { "category": "system", "scripts": {} },
-  "assets": { "category": "assets", "deployment": {} }
+  "generated": "2026-01-08T22:41:19Z",
+  "workspace": {
+    "category": "workspace",
+    "templates": {
+        "osaNormal": {
+          "name": "osaNormal",
+          "type": "word-doc-template",
+          "extension": ".dotm",
+          "src": "builds/osa/workspace/osaNormal/src/Normal.dotm",
+          "status": "active",
+          "partials": {
+            "osaNormalBodyStyles": "builds/osa/workspace/osaNormal/partials/styles/osa-normal-body-styles.xml",
+            "osaNormalCalloutStyles": "builds/osa/workspace/osaNormal/partials/styles/osa-normal-callout-styles.xml",
+            "osaNormalCaptionStyles": "builds/osa/workspace/osaNormal/partials/styles/osa-normal-caption-styles.xml",
+            "osaNormalCharacterStyles": "builds/osa/workspace/osaNormal/partials/styles/osa-normal-character-styles.xml",
+            "osaNormalDefaultStyles": "builds/osa/workspace/osaNormal/partials/styles/osa-normal-default-styles.xml",
+            "osaNormalDocDefaultStyles": "builds/osa/workspace/osaNormal/partials/styles/osa-normal-doc-default-styles.xml",
+            "osaNormalFooterStyles": "builds/osa/workspace/osaNormal/partials/styles/osa-normal-footer-styles.xml",
+            "osaNormalFrontMatterStyles": "builds/osa/workspace/osaNormal/partials/styles/osa-normal-front-matter-styles.xml",
+            "osaNormalHeaderStyles": "builds/osa/workspace/osaNormal/partials/styles/osa-normal-header-styles.xml",
+            "osaNormalHeadingStyles": "builds/osa/workspace/osaNormal/partials/styles/osa-normal-heading-styles.xml",
+            "osaNormalIndexStyles": "builds/osa/workspace/osaNormal/partials/styles/osa-normal-index-styles.xml",
+            "osaNormalListStyles": "builds/osa/workspace/osaNormal/partials/styles/osa-normal-list-styles.xml",
+            "osaNormalOtherStyles": "builds/osa/workspace/osaNormal/partials/styles/osa-normal-other-styles.xml",
+            "osaNormalTableStyles": "builds/osa/workspace/osaNormal/partials/styles/osa-normal-table-styles.xml",
+            "osaNormalTOCStyles": "builds/osa/workspace/osaNormal/partials/styles/osa-normal-toc-styles.xml",
+            "osaNormalNumbering": "builds/osa/workspace/osaNormal/partials/numbering/osa-normal-numbering.xml"
+          }
+        }
+    }
+  },
+  "templates": {
+    "category": "templates",
+    "templates": {
+        "osaReport": {
+          "name": "osaReport",
+          "type": "word-doc-template",
+          "extension": ".dotm",
+          "src": "builds/osa/templates/osaReport/out/osaReport.dotm",
+          "status": "active",
+          "partials": {
+            "osaReportFrontMatterStyles": "builds/osa/templates/osaReport/partials/styles/osa-report-front-matter-styles.xml",
+            "osaReportHeadingStyles": "builds/osa/templates/osaReport/partials/styles/osa-report-heading-styles.xml",
+            "osaReportListStyles": "builds/osa/templates/osaReport/partials/styles/osa-report-list-styles.xml",
+            "osaReportOtherStyles": "builds/osa/templates/osaReport/partials/styles/osa-report-other-styles.xml",
+            "osaReportNumbering": "builds/osa/templates/osaReport/partials/numbering/osa-report-numbering.xml"
+          }
+        },
+        "osaReportChapter": {
+          "name": "osaReportChapter",
+          "type": "",
+          "extension": "",
+          "src": "",
+          "status": "active"
+        }
+    }
+  },
+  "system": {
+    "category": "system",
+    "scripts": {}
+  },
+  "assets": {
+    "category": "assets",
+    "deployment": {}
+  }
 }

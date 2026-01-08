@@ -1,0 +1,16 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(python3:*)",
+      "Bash(style-import-map:*)",
+      "Bash(export PATH=\"$PWD/src/scripts/bin:$PATH\")",
+      "Bash(manifest-generate:*)",
+      "Bash(cat:*)",
+      "Bash(src/scripts/bin/style-import-map:*)",
+      "Bash(/usr/bin/head:*)",
+      "Bash(export PATH=\"/c/code/templx/src/scripts/bin:$PATH\")",
+      "Bash(/c/code/templx/src/scripts/bin/style-import-map:*)",
+      "Bash(pack:*)"
+    ]
+  }
+}

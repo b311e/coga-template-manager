@@ -95,37 +95,130 @@ process_templates_dir() {
     for template_dir in "$parent_dir"/*; do
         [[ ! -d "$template_dir" ]] && continue
         key=$(basename "$template_dir")
+
+        # Initialize variables
+        local found_file=""
+        local rel_path=""
+        local ext=""
+        local name="$key"
+        local type="word-doc-template"
+
+        # First, check out directory
         out_dir="$template_dir/out"
-        [[ ! -d "$out_dir" ]] && continue
-        for template_file in "$out_dir"/*.dotm "$out_dir"/*.dotx "$out_dir"/*.xltx; do
-            [[ ! -f "$template_file" ]] && continue
-            rel_path="${template_file#$PROJECT_ROOT/}"
-            file_name=$(basename "$template_file")
+        if [[ -d "$out_dir" ]]; then
+            for template_file in "$out_dir"/*.dotm "$out_dir"/*.dotx "$out_dir"/*.xltx "$out_dir"/*.xltm; do
+                # Skip temporary files (files starting with ~$)
+                [[ $(basename "$template_file") == ~\$* ]] && continue
+                [[ ! -f "$template_file" ]] && continue
+                found_file="$template_file"
+                break
+            done
+        fi
+
+        # If not found in out, check src directory
+        if [[ -z "$found_file" ]]; then
+            src_dir="$template_dir/src"
+            if [[ -d "$src_dir" ]]; then
+                for template_file in "$src_dir"/*.dotm "$src_dir"/*.dotx "$src_dir"/*.xltx "$src_dir"/*.xltm; do
+                    # Skip temporary files
+                    [[ $(basename "$template_file") == ~\$* ]] && continue
+                    [[ ! -f "$template_file" ]] && continue
+                    found_file="$template_file"
+                    break
+                done
+            fi
+        fi
+
+        # If we found a file, extract details
+        if [[ -n "$found_file" ]]; then
+            rel_path="${found_file#$PROJECT_ROOT/}"
+            file_name=$(basename "$found_file")
             ext=".${file_name##*.}"
-            name="$key"
             type="word-doc-template"
             [[ "$ext" == ".xltx" ]] && type="excel-book-template"
-            status=$(grep -A 10 "\"$key\"" "$manifest_file" | grep '"status"' | head -n1 | sed 's/.*"status": *"\([^"]*\)".*/\1/')
-            [[ -z "$status" ]] && status="active"
-            entry="        \"$key\": {\n          \"name\": \"$name\",\n          \"type\": \"$type\",\n          \"extension\": \"$ext\",\n          \"src\": \"$rel_path\",\n          \"status\": \"$status\"\n        }"
-            if [[ "$is_workspace" == "true" ]]; then
-                if $first_entry_workspace; then
-                    workspace_json="$entry"
-                    first_entry_workspace=false
-                else
-                    workspace_json="$workspace_json,\n$entry"
-                fi
-            else
-                if $first_entry_templates; then
-                    templates_json="$entry"
-                    first_entry_templates=false
-                else
-                    templates_json="$templates_json,\n$entry"
-                fi
-            fi
+            [[ "$ext" == ".xltm" ]] && type="excel-book-template"
             echo "  Found: $rel_path"
-            break
-        done
+        else
+            # No file found, but still add entry with empty src
+            rel_path=""
+            ext=""
+            type=""
+            echo "  Template directory found (no files): $key"
+        fi
+
+        # Get existing status from manifest if it exists
+        status=$(grep -A 10 "\"$key\"" "$manifest_file" | grep '"status"' | head -n1 | sed 's/.*"status": *"\([^"]*\)".*/\1/')
+        [[ -z "$status" ]] && status="active"
+
+        # Scan for partials
+        partials_json=""
+        partials_dir="$template_dir/partials"
+        if [[ -d "$partials_dir" ]]; then
+            # Scan styles partials
+            if [[ -d "$partials_dir/styles" ]]; then
+                for partial_file in "$partials_dir/styles"/*.xml; do
+                    [[ ! -f "$partial_file" ]] && continue
+                    partial_rel_path="${partial_file#$PROJECT_ROOT/}"
+                    # Extract snippet id from XML file
+                    partial_id=$(grep -m 1 '<snippet id=' "$partial_file" | sed 's/.*id="\([^"]*\)".*/\1/')
+                    # Fallback to filename if no id found
+                    [[ -z "$partial_id" ]] && partial_id=$(basename "$partial_file" .xml)
+                    if [[ -z "$partials_json" ]]; then
+                        partials_json="            \"$partial_id\": \"$partial_rel_path\""
+                    else
+                        partials_json="$partials_json,\n            \"$partial_id\": \"$partial_rel_path\""
+                    fi
+                done
+            fi
+            # Scan numbering partials
+            if [[ -d "$partials_dir/numbering" ]]; then
+                for partial_file in "$partials_dir/numbering"/*.xml; do
+                    [[ ! -f "$partial_file" ]] && continue
+                    partial_rel_path="${partial_file#$PROJECT_ROOT/}"
+                    # Extract snippet id from XML file
+                    partial_id=$(grep -m 1 '<snippet id=' "$partial_file" | sed 's/.*id="\([^"]*\)".*/\1/')
+                    # Fallback to filename if no id found
+                    [[ -z "$partial_id" ]] && partial_id=$(basename "$partial_file" .xml)
+                    if [[ -z "$partials_json" ]]; then
+                        partials_json="            \"$partial_id\": \"$partial_rel_path\""
+                    else
+                        partials_json="$partials_json,\n            \"$partial_id\": \"$partial_rel_path\""
+                    fi
+                done
+            fi
+        fi
+
+        # Build JSON entry
+        if [[ -n "$rel_path" ]]; then
+            if [[ -n "$partials_json" ]]; then
+                entry="        \"$key\": {\n          \"name\": \"$name\",\n          \"type\": \"$type\",\n          \"extension\": \"$ext\",\n          \"src\": \"$rel_path\",\n          \"status\": \"$status\",\n          \"partials\": {\n$partials_json\n          }\n        }"
+            else
+                entry="        \"$key\": {\n          \"name\": \"$name\",\n          \"type\": \"$type\",\n          \"extension\": \"$ext\",\n          \"src\": \"$rel_path\",\n          \"status\": \"$status\"\n        }"
+            fi
+        else
+            if [[ -n "$partials_json" ]]; then
+                entry="        \"$key\": {\n          \"name\": \"$name\",\n          \"type\": \"\",\n          \"extension\": \"\",\n          \"src\": \"\",\n          \"status\": \"$status\",\n          \"partials\": {\n$partials_json\n          }\n        }"
+            else
+                entry="        \"$key\": {\n          \"name\": \"$name\",\n          \"type\": \"\",\n          \"extension\": \"\",\n          \"src\": \"\",\n          \"status\": \"$status\"\n        }"
+            fi
+        fi
+
+        # Add to appropriate collection
+        if [[ "$is_workspace" == "true" ]]; then
+            if $first_entry_workspace; then
+                workspace_json="$entry"
+                first_entry_workspace=false
+            else
+                workspace_json="$workspace_json,\n$entry"
+            fi
+        else
+            if $first_entry_templates; then
+                templates_json="$entry"
+                first_entry_templates=false
+            else
+                templates_json="$templates_json,\n$entry"
+            fi
+        fi
     done
 }
 
