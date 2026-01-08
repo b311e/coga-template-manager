@@ -1,0 +1,63 @@
+{
+  "committee_name": "",
+  "committee_address_line_1": "",
+  "committee_address_line_2": "",
+  "committee_email": "",
+  "committee_phone": "",
+  "committee_members": {
+    "left_column": [
+      {
+        "title": "",
+        "full_name": "",
+        "position": "Chair"
+      },
+      {
+        "title": "",
+        "full_name": "",
+        "position": "Member"
+      },
+      {
+        "title": "",
+        "full_name": "",
+        "position": "Member"
+      },
+      {
+        "title": "",
+        "full_name": "",
+        "position": "Member"
+      },
+      {
+        "title": "",
+        "full_name": "",
+        "position": "Member"
+      }
+    ],
+    "right_column": [
+      {
+        "title": "",
+        "full_name": "",
+        "position": "Vice Chair"
+      },
+      {
+        "title": "",
+        "full_name": "",
+        "position": "Member"
+      },
+      {
+        "title": "",
+        "full_name": "",
+        "position": "Member"
+      },
+      {
+        "title": "",
+        "full_name": "",
+        "position": "Member"
+      },
+      {
+        "title": "",
+        "full_name": "",
+        "position": "Member"
+      }
+    ]
+  }
+}

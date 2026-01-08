@@ -1,0 +1,122 @@
+{
+    "committee_id_session": "H_APP_2025A",
+    "generic_id": "H_APP",
+    "committee_type": "Committee of Reference",
+    "committee_name": "Appropriations",
+    "chamber": "House",
+    "committee_abbrev": "APP",
+    "display_member_page": "Yes",
+    "committee_staff": [
+        {
+            "staff_name": "Emily Pope",
+            "staff_phone": "303-866-4961"
+        }
+    ],
+    "committee_staff_email": "emily.pope@coleg.gov",
+    "committee_session": "2025A",
+    "committee_meetings": [
+        {
+            "meeting_day": "Friday",
+            "meeting_time": "7:30 AM",
+            "meeting_location": "Old State Library"
+        }
+    ],
+    "alternate_meeting_day_language": "",
+    "committee_members": [
+        {
+            "m_member_id": "ES001",
+            "title": "Representative",
+            "full_name": "Emily Sirota",
+            "last_name": "Sirota",
+            "position": "Chair",
+            "legislator": "Yes"
+        },
+        {
+            "m_member_id": "SB002",
+            "title": "Representative",
+            "full_name": "Shannon Bird",
+            "last_name": "Bird",
+            "position": "Vice Chair",
+            "legislator": "Yes"
+        },
+        {
+            "m_member_id": "AB002",
+            "title": "Representative",
+            "full_name": "Andrew Boesenecker",
+            "last_name": "Boesenecker",
+            "position": "",
+            "legislator": "Yes"
+        },
+        {
+            "m_member_id": "SB003",
+            "title": "Representative",
+            "full_name": "Scott Bottoms",
+            "last_name": "Bottoms",
+            "position": "",
+            "legislator": "Yes"
+        },
+        {
+            "m_member_id": "KB002",
+            "title": "Representative",
+            "full_name": "Kyle Brown",
+            "last_name": "Brown",
+            "position": "",
+            "legislator": "Yes"
+        },
+        {
+            "m_member_id": "JJ002",
+            "title": "Representative",
+            "full_name": "Junie Joseph",
+            "last_name": "Joseph",
+            "position": "",
+            "legislator": "Yes"
+        },
+        {
+            "m_member_id": "KM002",
+            "title": "Representative",
+            "full_name": "Karen McCormick",
+            "last_name": "McCormick",
+            "position": "",
+            "legislator": "Yes"
+        },
+        {
+            "m_member_id": "MS003",
+            "title": "Representative",
+            "full_name": "Matt Soper",
+            "last_name": "Soper",
+            "position": "",
+            "legislator": "Yes"
+        },
+        {
+            "m_member_id": "RT001",
+            "title": "Representative",
+            "full_name": "Rick Taggart",
+            "last_name": "Taggart",
+            "position": "",
+            "legislator": "Yes"
+        },
+        {
+            "m_member_id": "BT001",
+            "title": "Representative",
+            "full_name": "Brianna Titone",
+            "last_name": "Titone",
+            "position": "",
+            "legislator": "Yes"
+        },
+        {
+            "m_member_id": "EV002",
+            "title": "Representative",
+            "full_name": "Elizabeth Velasco",
+            "last_name": "Velasco",
+            "position": "",
+            "legislator": "Yes"
+        }
+    ],
+    "committee_description": "The House Appropriations Committee conducts hearings on bills that change expenditures or revenues and affect the budget. The Committee typically reserves discussion for the fiscal impact of the bills. Many of the bills considered by the Committee have had hearings in other committees before being referred to Appropriations and for those bills that have previously had a hearing the Committee does not customarily take public testimony.",
+    "committee_subject": [
+        "State Revenue & Budget"
+    ],
+    "twitter_handle": "https://twitter.com/COAppropsComm",
+    "granicus_id": 14,
+    "sliq_id": 24
+}

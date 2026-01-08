@@ -1,0 +1,89 @@
+{
+    "committee_id_session": "I_JailStandards_2025A",
+    "generic_id": "I_JailStandards",
+    "committee_type": "Interim Committee",
+    "committee_name": "Legislative Oversight Committee Concerning Colorado Jail Standards",
+    "chamber": "Interim Committee",
+    "committee_abbrev": "JailStandards",
+    "display_member_page": "No",
+    "committee_staff": [
+        {
+            "staff_name": "Elizabeth Burger",
+            "staff_phone": "303-866-6272"
+        },
+        {
+            "staff_name": "Jessika Shipley",
+            "staff_phone": "303-866-3528"
+        }
+    ],
+    "committee_staff_email": "JailStandards.ga@coleg.gov",
+    "committee_session": "2025A",
+    "committee_meetings": [],
+    "alternate_meeting_day_language": "",
+    "committee_members": [
+        {
+            "m_member_id": "CC001",
+            "title": "Representative",
+            "full_name": "Chad Clifford",
+            "last_name": "Clifford",
+            "position": "Chair",
+            "legislator": "Yes"
+        },
+        {
+            "m_member_id": "",
+            "title": "",
+            "full_name": "",
+            "last_name": "",
+            "position": "Vice Chair",
+            "legislator": "No"
+        },
+        {
+            "m_member_id": "MB004",
+            "title": "Senator",
+            "full_name": "Matt Ball",
+            "last_name": "Ball",
+            "position": "",
+            "legislator": "Yes"
+        },
+        {
+            "m_member_id": "MB002",
+            "title": "Representative",
+            "full_name": "Mary Bradfield",
+            "last_name": "Bradfield",
+            "position": "",
+            "legislator": "Yes"
+        },
+        {
+            "m_member_id": "LG003",
+            "title": "Representative",
+            "full_name": "Lorena Garcia",
+            "last_name": "Garcia",
+            "position": "",
+            "legislator": "Yes"
+        },
+        {
+            "m_member_id": "DJ002",
+            "title": "Senator",
+            "full_name": "Dafna Michaelson Jenet",
+            "last_name": "Michaelson Jenet",
+            "position": "",
+            "legislator": "Yes"
+        },
+        {
+            "m_member_id": "BP002",
+            "title": "Senator",
+            "full_name": "Byron Pelton",
+            "last_name": "Pelton B.",
+            "position": "",
+            "legislator": "Yes"
+        }
+    ],
+    "committee_description": "The oversight committee maintains and updates Colorado jail standards, reviews reports from the Jail Standards Advisory Committee, and recommends legislation on jail standards and operations.",
+    "committee_subject": [
+        "Crimes, Corrections, & Enforcement",
+        "Local Government"
+    ],
+    "twitter_handle": "",
+    "granicus_id": 0,
+    "sliq_id": 166
+}
