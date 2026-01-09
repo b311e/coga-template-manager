@@ -1,2 +1,2 @@
 #!/usr/bin/env bash
-exec "$(dirname "${BASH_SOURCE[0]}")/../manifest_utils/manifest" "$@"
+exec "$(dirname "${BASH_SOURCE[0]}")/../commands/manifest-utils/manifest" "$@"

@@ -1,0 +1,460 @@
+{
+  "manifest_version": "1.0",
+  "generated": "2026-01-09T06:07:55Z",
+  "builds": {
+    "core": {
+      "workspace": {
+        "normal": {
+          "type": "word-doc-template",
+          "extension": ".dotm",
+          "directory": "builds/core/workspace/coreNormal",
+          "collection": "normal",
+          "status": "active",
+          "partials": {
+            "normal-body-styles": {
+              "path": "builds/core/workspace/coreNormal/partials/styles/core-normal-body-styles.xml",
+              "partial_type": "styles"
+            },
+            "normal-callout-styles": {
+              "path": "builds/core/workspace/coreNormal/partials/styles/core-normal-callout-styles.xml",
+              "partial_type": "styles"
+            },
+            "normal-caption-styles": {
+              "path": "builds/core/workspace/coreNormal/partials/styles/core-normal-caption-styles.xml",
+              "partial_type": "styles"
+            },
+            "normal-character-styles": {
+              "path": "builds/core/workspace/coreNormal/partials/styles/core-normal-character-styles.xml",
+              "partial_type": "styles"
+            },
+            "normal-default-styles": {
+              "path": "builds/core/workspace/coreNormal/partials/styles/core-normal-default-styles.xml",
+              "partial_type": "styles"
+            },
+            "normal-doc-default-styles": {
+              "path": "builds/core/workspace/coreNormal/partials/styles/core-normal-doc-default-styles.xml",
+              "partial_type": "styles"
+            },
+            "normal-footer-styles": {
+              "path": "builds/core/workspace/coreNormal/partials/styles/core-normal-footer-styles.xml",
+              "partial_type": "styles"
+            },
+            "normal-front-matter-styles": {
+              "path": "builds/core/workspace/coreNormal/partials/styles/core-normal-front-matter-styles.xml",
+              "partial_type": "styles"
+            },
+            "normal-header-styles": {
+              "path": "builds/core/workspace/coreNormal/partials/styles/core-normal-header-styles.xml",
+              "partial_type": "styles"
+            },
+            "normal-heading-styles": {
+              "path": "builds/core/workspace/coreNormal/partials/styles/core-normal-heading-styles.xml",
+              "partial_type": "styles"
+            },
+            "normal-index-styles": {
+              "path": "builds/core/workspace/coreNormal/partials/styles/core-normal-index-styles.xml",
+              "partial_type": "styles"
+            },
+            "normal-list-styles": {
+              "path": "builds/core/workspace/coreNormal/partials/styles/core-normal-list-styles.xml",
+              "partial_type": "styles"
+            },
+            "normal-other-styles": {
+              "path": "builds/core/workspace/coreNormal/partials/styles/core-normal-other-styles.xml",
+              "partial_type": "styles"
+            },
+            "normal-toc-styles": {
+              "path": "builds/core/workspace/coreNormal/partials/styles/core-normal-toc-styles.xml",
+              "partial_type": "styles"
+            },
+            "normal-numbering": {
+              "path": "builds/core/workspace/coreNormal/partials/numbering/core-normal-numbering.xml",
+              "partial_type": "numbering"
+            }
+          }
+        }
+      },
+      "templates": {
+        "committee_letterhead": {
+          "type": "word-doc-template",
+          "extension": ".dotm",
+          "directory": "builds/core/templates/coreCommitteeLetterheaad",
+          "collection": "letterhead",
+          "status": "in progress"
+        },
+        "contract": {
+          "type": "word-doc-template",
+          "extension": ".dotm",
+          "directory": "builds/core/templates/coreContract",
+          "collection": "contract",
+          "status": "active"
+        }
+      }
+    },
+    "jbc": {
+      "workspace": {
+        "book": {
+          "type": "excel-book-template",
+          "extension": ".xltx",
+          "directory": "builds/jbc/workspace/jbcBook",
+          "collection": "book",
+          "status": "active"
+        },
+        "colors": {
+          "type": "",
+          "extension": "",
+          "directory": "builds/jbc/workspace/jbcColors",
+          "collection": "colors",
+          "status": "active"
+        },
+        "fonts": {
+          "type": "",
+          "extension": "",
+          "directory": "builds/jbc/workspace/jbcFonts",
+          "collection": "fonts",
+          "status": "active"
+        },
+        "normal": {
+          "type": "word-doc-template",
+          "extension": ".dotm",
+          "directory": "builds/jbc/workspace/jbcNormal",
+          "collection": "normal",
+          "status": "active",
+          "partials": {
+            "normal-body-styles": {
+              "path": "builds/jbc/workspace/jbcNormal/partials/styles/jbc-normal-body-styles.xml",
+              "partial_type": "styles"
+            },
+            "normal-callout-styles": {
+              "path": "builds/jbc/workspace/jbcNormal/partials/styles/jbc-normal-callout-styles.xml",
+              "partial_type": "styles"
+            },
+            "normal-caption-styles": {
+              "path": "builds/jbc/workspace/jbcNormal/partials/styles/jbc-normal-caption-styles.xml",
+              "partial_type": "styles"
+            },
+            "normal-character-styles": {
+              "path": "builds/jbc/workspace/jbcNormal/partials/styles/jbc-normal-character-styles.xml",
+              "partial_type": "styles"
+            },
+            "normal-default-styles": {
+              "path": "builds/jbc/workspace/jbcNormal/partials/styles/jbc-normal-default-styles.xml",
+              "partial_type": "styles"
+            },
+            "normal-doc-default-styles": {
+              "path": "builds/jbc/workspace/jbcNormal/partials/styles/jbc-normal-doc-default-styles.xml",
+              "partial_type": "styles"
+            },
+            "normal-footer-styles": {
+              "path": "builds/jbc/workspace/jbcNormal/partials/styles/jbc-normal-footer-styles.xml",
+              "partial_type": "styles"
+            },
+            "normal-front-matter-styles": {
+              "path": "builds/jbc/workspace/jbcNormal/partials/styles/jbc-normal-front-matter-styles.xml",
+              "partial_type": "styles"
+            },
+            "normal-header-styles": {
+              "path": "builds/jbc/workspace/jbcNormal/partials/styles/jbc-normal-header-styles.xml",
+              "partial_type": "styles"
+            },
+            "normal-heading-styles": {
+              "path": "builds/jbc/workspace/jbcNormal/partials/styles/jbc-normal-heading-styles.xml",
+              "partial_type": "styles"
+            },
+            "normal-list-styles": {
+              "path": "builds/jbc/workspace/jbcNormal/partials/styles/jbc-normal-list-styles.xml",
+              "partial_type": "styles"
+            },
+            "normal-other-styles": {
+              "path": "builds/jbc/workspace/jbcNormal/partials/styles/jbc-normal-other-styles.xml",
+              "partial_type": "styles"
+            },
+            "normal-table-styles": {
+              "path": "builds/jbc/workspace/jbcNormal/partials/styles/jbc-normal-table-styles.xml",
+              "partial_type": "styles"
+            },
+            "normal-toc-styles": {
+              "path": "builds/jbc/workspace/jbcNormal/partials/styles/jbc-normal-toc-styles.xml",
+              "partial_type": "styles"
+            },
+            "normal-numbering": {
+              "path": "builds/jbc/workspace/jbcNormal/partials/numbering/jbc-normal-numbering.xml",
+              "partial_type": "numbering"
+            }
+          }
+        },
+        "office_ui": {
+          "type": "",
+          "extension": "",
+          "directory": "builds/jbc/workspace/jbcOfficeUi",
+          "collection": "office_ui",
+          "status": "active"
+        },
+        "sheet": {
+          "type": "excel-book-template",
+          "extension": ".xltx",
+          "directory": "builds/jbc/workspace/jbcSheet",
+          "collection": "sheet",
+          "status": "active"
+        },
+        "theme": {
+          "type": "",
+          "extension": "",
+          "directory": "builds/jbc/workspace/jbcTheme",
+          "collection": "theme",
+          "status": "active"
+        }
+      },
+      "templates": {
+        "budget": {
+          "type": "",
+          "extension": "",
+          "directory": "builds/jbc/templates/jbcBudget",
+          "collection": "budget",
+          "status": "active",
+          "partials": {
+            "budget-front-matter-styles": {
+              "path": "builds/jbc/templates/jbcBudget/partials/styles/jbc-budget-front-matter-styles.xml",
+              "partial_type": "styles"
+            },
+            "budget-heading-styles": {
+              "path": "builds/jbc/templates/jbcBudget/partials/styles/jbc-budget-heading-styles.xml",
+              "partial_type": "styles"
+            },
+            "budget-other-styles": {
+              "path": "builds/jbc/templates/jbcBudget/partials/styles/jbc-budget-other-styles.xml",
+              "partial_type": "styles"
+            },
+            "budget-numbering": {
+              "path": "builds/jbc/templates/jbcBudget/partials/numbering/jbc-budget-numbering.xml",
+              "partial_type": "numbering"
+            }
+          }
+        },
+        "budget_briefing": {
+          "type": "word-doc-template",
+          "extension": ".dotm",
+          "directory": "builds/jbc/templates/jbcBudgetBriefing",
+          "collection": "budget_briefing",
+          "status": "active"
+        },
+        "budget_briefing_highlights": {
+          "type": "word-doc-template",
+          "extension": ".dotm",
+          "directory": "builds/jbc/templates/jbcBudgetBriefingHighlights",
+          "collection": "budget_briefing_highlights",
+          "status": "active"
+        },
+        "budget_briefing_summary": {
+          "type": "word-doc-template",
+          "extension": ".dotm",
+          "directory": "builds/jbc/templates/jbcBudgetBriefingSummary",
+          "collection": "budget_briefing_summary",
+          "status": "active"
+        },
+        "figure_setting": {
+          "type": "word-doc-template",
+          "extension": ".dotm",
+          "directory": "builds/jbc/templates/jbcFigureSetting",
+          "collection": "figure_setting",
+          "status": "active"
+        },
+        "letterhead": {
+          "type": "word-doc-template",
+          "extension": ".dotm",
+          "directory": "builds/jbc/templates/jbcLetterhead",
+          "collection": "letterhead",
+          "status": "active",
+          "partials": {
+            "letter-front-matter-styles": {
+              "path": "builds/jbc/templates/jbcLetterhead/partials/styles/jbc-letter-front-matter-styles.xml",
+              "partial_type": "styles"
+            },
+            "letter-heading-styles": {
+              "path": "builds/jbc/templates/jbcLetterhead/partials/styles/jbc-letter-heading-styles.xml",
+              "partial_type": "styles"
+            },
+            "letterhead-numbering": {
+              "path": "builds/jbc/templates/jbcLetterhead/partials/numbering/jbc-letterhead-numbering.xml",
+              "partial_type": "numbering"
+            }
+          }
+        },
+        "memo": {
+          "type": "word-doc-template",
+          "extension": ".dotm",
+          "directory": "builds/jbc/templates/jbcMemo",
+          "collection": "memo",
+          "status": "active"
+        },
+        "publication": {
+          "type": "word-doc-template",
+          "extension": ".dotm",
+          "directory": "builds/jbc/templates/jbcPublication",
+          "collection": "publication",
+          "status": "active",
+          "partials": {
+            "publication-front-matter-styles": {
+              "path": "builds/jbc/templates/jbcPublication/partials/styles/jbc-publication-front-matter-styles.xml",
+              "partial_type": "styles"
+            },
+            "publication-heading-styles": {
+              "path": "builds/jbc/templates/jbcPublication/partials/styles/jbc-publication-heading-styles.xml",
+              "partial_type": "styles"
+            }
+          }
+        },
+        "supplemental_briefing": {
+          "type": "word-doc-template",
+          "extension": ".dotm",
+          "directory": "builds/jbc/templates/jbcSupplementalBriefing",
+          "collection": "supplemental_briefing",
+          "status": "active"
+        }
+      }
+    },
+    "lcs": {
+      "workspace": {
+        "normal": {
+          "type": "",
+          "extension": "",
+          "directory": "builds/lcs/workspace/lcsNormal",
+          "collection": "normal",
+          "status": "active"
+        }
+      },
+      "templates": {
+
+      }
+    },
+    "olls": {
+      "workspace": {
+
+      },
+      "templates": {
+        "o_l_l_s _contract _personal _services _template": {
+          "type": "word-doc-template",
+          "extension": ".dotm",
+          "directory": "builds/olls/templates/OLLS Contract Personal Services Template",
+          "collection": "o_l_l_s _contract _personal _services _template",
+          "status": "active"
+        }
+      }
+    },
+    "osa": {
+      "workspace": {
+        "normal": {
+          "type": "word-doc-template",
+          "extension": ".dotm",
+          "directory": "builds/osa/workspace/osaNormal",
+          "collection": "normal",
+          "status": "active",
+          "partials": {
+            "normal-body-styles": {
+              "path": "builds/osa/workspace/osaNormal/partials/styles/osa-normal-body-styles.xml",
+              "partial_type": "styles"
+            },
+            "normal-callout-styles": {
+              "path": "builds/osa/workspace/osaNormal/partials/styles/osa-normal-callout-styles.xml",
+              "partial_type": "styles"
+            },
+            "normal-caption-styles": {
+              "path": "builds/osa/workspace/osaNormal/partials/styles/osa-normal-caption-styles.xml",
+              "partial_type": "styles"
+            },
+            "normal-character-styles": {
+              "path": "builds/osa/workspace/osaNormal/partials/styles/osa-normal-character-styles.xml",
+              "partial_type": "styles"
+            },
+            "normal-default-styles": {
+              "path": "builds/osa/workspace/osaNormal/partials/styles/osa-normal-default-styles.xml",
+              "partial_type": "styles"
+            },
+            "normal-doc-default-styles": {
+              "path": "builds/osa/workspace/osaNormal/partials/styles/osa-normal-doc-default-styles.xml",
+              "partial_type": "styles"
+            },
+            "normal-footer-styles": {
+              "path": "builds/osa/workspace/osaNormal/partials/styles/osa-normal-footer-styles.xml",
+              "partial_type": "styles"
+            },
+            "normal-front-matter-styles": {
+              "path": "builds/osa/workspace/osaNormal/partials/styles/osa-normal-front-matter-styles.xml",
+              "partial_type": "styles"
+            },
+            "normal-header-styles": {
+              "path": "builds/osa/workspace/osaNormal/partials/styles/osa-normal-header-styles.xml",
+              "partial_type": "styles"
+            },
+            "normal-heading-styles": {
+              "path": "builds/osa/workspace/osaNormal/partials/styles/osa-normal-heading-styles.xml",
+              "partial_type": "styles"
+            },
+            "normal-index-styles": {
+              "path": "builds/osa/workspace/osaNormal/partials/styles/osa-normal-index-styles.xml",
+              "partial_type": "styles"
+            },
+            "normal-list-styles": {
+              "path": "builds/osa/workspace/osaNormal/partials/styles/osa-normal-list-styles.xml",
+              "partial_type": "styles"
+            },
+            "normal-other-styles": {
+              "path": "builds/osa/workspace/osaNormal/partials/styles/osa-normal-other-styles.xml",
+              "partial_type": "styles"
+            },
+            "normal-table-styles": {
+              "path": "builds/osa/workspace/osaNormal/partials/styles/osa-normal-table-styles.xml",
+              "partial_type": "styles"
+            },
+            "normal-toc-styles": {
+              "path": "builds/osa/workspace/osaNormal/partials/styles/osa-normal-toc-styles.xml",
+              "partial_type": "styles"
+            },
+            "normal-numbering": {
+              "path": "builds/osa/workspace/osaNormal/partials/numbering/osa-normal-numbering.xml",
+              "partial_type": "numbering"
+            }
+          }
+        }
+      },
+      "templates": {
+        "report": {
+          "type": "word-doc-template",
+          "extension": ".dotm",
+          "directory": "builds/osa/templates/osaReport",
+          "collection": "report",
+          "status": "active",
+          "partials": {
+            "report-front-matter-styles": {
+              "path": "builds/osa/templates/osaReport/partials/styles/osa-report-front-matter-styles.xml",
+              "partial_type": "styles"
+            },
+            "report-heading-styles": {
+              "path": "builds/osa/templates/osaReport/partials/styles/osa-report-heading-styles.xml",
+              "partial_type": "styles"
+            },
+            "report-list-styles": {
+              "path": "builds/osa/templates/osaReport/partials/styles/osa-report-list-styles.xml",
+              "partial_type": "styles"
+            },
+            "report-other-styles": {
+              "path": "builds/osa/templates/osaReport/partials/styles/osa-report-other-styles.xml",
+              "partial_type": "styles"
+            },
+            "report-numbering": {
+              "path": "builds/osa/templates/osaReport/partials/numbering/osa-report-numbering.xml",
+              "partial_type": "numbering"
+            }
+          }
+        },
+        "report_chapter": {
+          "type": "",
+          "extension": "",
+          "directory": "builds/osa/templates/osaReportChapter",
+          "collection": "report_chapter",
+          "status": "active"
+        }
+      }
+    }
+  }
+}
