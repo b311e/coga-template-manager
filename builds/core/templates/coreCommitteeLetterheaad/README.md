@@ -16,5 +16,9 @@ The config folder is where the json file containing the committee member names, 
 - [ ] Replace the text in the content controls with actual placeholder text (see the example in the body of the doc for code, the text read "test placeholder text")
 - [ ] Reorder the styles that must stay in this template, including Colorado General Assembly, Committee Member, Committee Name, Address, Email, Phone, Date, Heading 2, Heading 3, Heading 4.
 - [ ] Clean up VBA script so it isn't embarrassing to show the devs
+- [ ] Fix the path for the config, because i renamed it config_fields.json
 
 Can we connect this to the CLICS Endpoint API so the file values auto-update? Might be too complicated because the order of the names can change depending on the template.
+
+
+See UPDATES file

@@ -12,7 +12,10 @@
       "Bash(/c/code/templx/src/scripts/bin/style-import-map:*)",
       "Bash(pack:*)",
       "Bash(npm run manifest-generate:*)",
-      "Bash(bash:*)"
+      "Bash(bash:*)",
+      "Bash(manifest generate:*)",
+      "Bash(git add:*)",
+      "Bash(git commit:*)"
     ]
   }
 }

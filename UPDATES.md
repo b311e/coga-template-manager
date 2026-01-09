@@ -40,7 +40,43 @@ manifests & naming
 - [ ] move style-map.md from docs into a config folder
 - [ ] change style-map.md --> style_map.json
 - [ ] update all partial_id to be in kabob_case
+- [ ] delete all old manifests
 
+{
+  "manifest_version": "1.0",
+  "generated": "2026-01-09T...",
+  "builds": {
+    "core": {
+      "workspace": {
+        "normal": {
+          "type": "word-doc-template",
+          "extension": ".dotm",
+          "directory": "builds/core/workspace/normal",
+          "collection": "normal",
+          "status": "active",
+          "partials": {
+            "body_styles": {
+              "path": "builds/core/.../body-styles.xml",
+              "partial_type": "styles"
+            }
+          }
+        }
+      },
+      "templates": {
+        "committee_letterhead": {
+          "type": "word-doc-template",
+          "extension": ".dotm",
+          "directory": "builds/core/templates/committee_letterhead",
+          "collection": "letterhead",
+          "status": "in progress",
+          "partials": { ... }
+        }
+      }
+    }
+  }
+}
+
+BAD IDEA:
 
 builds: {
     core: {
