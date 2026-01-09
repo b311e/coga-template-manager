@@ -1,0 +1,63 @@
+{
+  "committee_name": "Executive Committee of the Legislative Council",
+  "committee_address_line_1": "State Capitol Building, Room 011",
+  "committee_address_line_2": "Denver, Colorado 80203-1784",
+  "committee_email": "",
+  "committee_phone": "(303) 866-3521",
+  "committee_members": {
+    "left_column": [
+      {
+        "title": "Rep.",
+        "full_name": "Julie McCluskie",
+        "position": "Chair"
+      },
+      {
+        "title": "Rep.",
+        "full_name": "James Coleman",
+        "position": "Member"
+      },
+      {
+        "title": "Rep.",
+        "full_name": "Test Test",
+        "position": "Member"
+      },
+      {
+        "title": "Rep.",
+        "full_name": "Test Test",
+        "position": "Member"
+      },
+      {
+        "title": "Rep.",
+        "full_name": "Test Test",
+        "position": "Member"
+      }
+    ],
+    "right_column": [
+      {
+        "title": "Sen.",
+        "full_name": "James Coleman",
+        "position": "Vice Chair"
+      },
+      {
+        "title": "Sen.",
+        "full_name": "",
+        "position": "Member"
+      },
+      {
+        "title": "",
+        "full_name": "",
+        "position": "Member"
+      },
+      {
+        "title": "",
+        "full_name": "",
+        "position": "Member"
+      },
+      {
+        "title": "",
+        "full_name": "",
+        "position": "Member"
+      }
+    ]
+  }
+}
