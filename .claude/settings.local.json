@@ -10,7 +10,9 @@
       "Bash(/usr/bin/head:*)",
       "Bash(export PATH=\"/c/code/templx/src/scripts/bin:$PATH\")",
       "Bash(/c/code/templx/src/scripts/bin/style-import-map:*)",
-      "Bash(pack:*)"
+      "Bash(pack:*)",
+      "Bash(npm run manifest-generate:*)",
+      "Bash(bash:*)"
     ]
   }
 }

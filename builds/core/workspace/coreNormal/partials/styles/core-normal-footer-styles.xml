@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<snippet id="coreNormalFooterStyles"
+    xmlns:w="http://schemas.openxmlformats.org/wordprocessingml/2006/main">
+    <w:style w:type="paragraph" w:styleId="Footer">
+        <w:name w:val="footer" />
+        <w:basedOn w:val="Normal" />
+        <w:uiPriority w:val="99" />
+        <w:semiHidden />
+        <w:pPr>
+            <w:tabs>
+                <w:tab w:val="center" w:pos="4680" />
+                <w:tab w:val="right" w:pos="9360" />
+            </w:tabs>
+            <w:spacing w:before="240" w:after="0" w:line="240" w:lineRule="auto" />
+        </w:pPr>
+        <w:rPr>
+            <w:sz w:val="20" />
+        </w:rPr>
+    </w:style>
+    <w:style w:type="paragraph" w:styleId="FootnoteText">
+        <w:name w:val="footnote text" />
+        <w:basedOn w:val="Normal" />
+        <w:uiPriority w:val="99" />
+        <w:semiHidden />
+        <w:pPr>
+            <w:spacing w:after="0" w:line="240" w:lineRule="auto" />
+        </w:pPr>
+        <w:rPr>
+            <w:color w:themeColor="text1" w:themeTint="A6" />
+            <w:sz w:val="20" />
+        </w:rPr>
+    </w:style>
+    <w:style w:type="character" w:styleId="FootnoteReference">
+        <w:name w:val="footnote reference" />
+        <w:basedOn w:val="DefaultParagraphFont" />
+        <w:uiPriority w:val="99" />
+        <w:semiHidden />
+        <w:rPr>
+            <w:vertAlign w:val="superscript" />
+        </w:rPr>
+    </w:style>
+    <w:style w:type="character" w:styleId="EndnoteReference">
+        <w:name w:val="endnote reference"/>
+        <w:uiPriority w:val="99"/>
+        <w:semiHidden/>
+    </w:style>
+    <w:style w:type="paragraph" w:styleId="EndnoteText">
+        <w:name w:val="endnote text"/>
+        <w:uiPriority w:val="99"/>
+        <w:semiHidden/>
+    </w:style>
+</snippet>

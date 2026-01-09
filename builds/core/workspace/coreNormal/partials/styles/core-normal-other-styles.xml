@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<snippet id="osaNormalOtherStyles"
+<snippet id="coreNormalOtherStyles"
     xmlns:w="http://schemas.openxmlformats.org/wordprocessingml/2006/main">
     <w:style w:type="paragraph" w:customStyle="1" w:styleId="TableTitle">
         <w:name w:val="Table Title" />

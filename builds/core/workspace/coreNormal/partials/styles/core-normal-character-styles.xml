@@ -1,0 +1,94 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<snippet id="coreNormalCharacterStyles"
+    xmlns:w="http://schemas.openxmlformats.org/wordprocessingml/2006/main">
+    <w:style w:type="character" w:styleId="Hyperlink">
+        <w:name w:val="Hyperlink" />
+        <w:basedOn w:val="DefaultParagraphFont" />
+        <w:uiPriority w:val="99" />
+        <w:semiHidden />
+        <w:rPr>
+            <w:color w:themeColor="hyperlink" />
+            <w:u w:val="single" />
+        </w:rPr>
+    </w:style>
+    <w:style w:type="character" w:styleId="Strong">
+        <w:name w:val="Strong"/>
+        <w:basedOn w:val="DefaultParagraphFont"/>
+        <w:uiPriority w:val="99"/>
+        <w:semiHidden />
+        <w:rPr>
+            <w:b/>
+            <w:color w:themeColor="accent1" />
+        </w:rPr>
+    </w:style>
+    <w:style w:type="character" w:styleId="Emphasis">
+        <w:name w:val="Emphasis"/>
+        <w:basedOn w:val="DefaultParagraphFont"/>
+        <w:uiPriority w:val="99"/>
+        <w:semiHidden />
+        <w:rPr>
+            <w:i/>
+        </w:rPr>
+    </w:style>
+    <w:style w:type="character" w:styleId="IntenseEmphasis">
+        <w:name w:val="Intense Emphasis"/>
+        <w:basedOn w:val="DefaultParagraphFont"/>
+        <w:uiPriority w:val="99"/>
+        <w:semiHidden />
+        <w:rPr>
+            <w:b/>
+            <w:i/>
+            <w:color w:themeColor="accent1"/>
+        </w:rPr>
+    </w:style>
+    <w:style w:type="character" w:styleId="SubtleEmphasis">
+        <w:name w:val="Subtle Emphasis"/>
+        <w:basedOn w:val="DefaultParagraphFont"/>
+        <w:uiPriority w:val="99"/>
+        <w:semiHidden />
+        <w:rPr>
+            <w:i/>
+        </w:rPr>
+    </w:style>
+    <w:style w:type="character" w:styleId="IntenseReference">
+        <w:name w:val="Intense Reference"/>
+        <w:basedOn w:val="DefaultParagraphFont"/>
+        <w:uiPriority w:val="99"/>
+        <w:semiHidden />
+        <w:rPr>
+            <w:b/>
+            <w:smallCaps/>
+            <w:color w:themeColor="accent1"/>
+        </w:rPr>
+    </w:style>
+    <w:style w:type="character" w:styleId="SubtleReference">
+        <w:name w:val="Subtle Reference"/>
+        <w:basedOn w:val="DefaultParagraphFont"/>
+        <w:uiPriority w:val="99"/>
+        <w:semiHidden />
+        <w:rPr>
+            <w:i/>
+            <w:smallCaps/>
+            <w:color w:themeColor="accent1"/>
+        </w:rPr>
+    </w:style>
+    <w:style w:type="character" w:styleId="BookTitle">
+        <w:name w:val="Book Title"/>
+        <w:basedOn w:val="DefaultParagraphFont"/>
+        <w:uiPriority w:val="99"/>
+        <w:semiHidden />
+        <w:rPr>
+            <w:b/>
+            <w:i/>
+        </w:rPr>
+    </w:style>
+    <w:style w:type="character" w:customStyle="1" w:styleId="Note">
+        <w:name w:val="[Note]" />
+        <w:basedOn w:val="DefaultParagraphFont" />
+        <w:uiPriority w:val="40" />
+        <w:semiHidden />
+        <w:rPr>
+            <w:color w:val="C00000" />
+        </w:rPr>
+    </w:style>
+</snippet>

@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<snippet id="coreNormalHeaderStyles"
+    xmlns:w="http://schemas.openxmlformats.org/wordprocessingml/2006/main">
+    <w:style w:type="paragraph" w:styleId="Header">
+        <w:name w:val="Header" />
+        <w:basedOn w:val="Normal" />
+        <w:semiHidden />
+        <w:uiPriority w:val="99" />
+        <w:pPr>
+            <w:spacing w:after="240" w:line="240" w:lineRule="auto" />
+        </w:pPr>
+        <w:rPr>
+            <w:rFonts w:asciiTheme="majorHAnsi" w:hAnsiTheme="majorHAnsi"/>
+            <w:sz w:val="20" />
+        </w:rPr>
+    </w:style>
+</snippet>

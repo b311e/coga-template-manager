@@ -1,38 +1,61 @@
 {
-  "generated": "2025-12-24T02:59:53Z",
-  "core": {
-    "base": {
-      "normal": [
-        
-      ],
-      "theme": [
-        
-      ],
-      "sheet": [
-        
-      ],
-      "book": [
-        
-      ],
-      "colors": [
-        
-      ],
-      "fonts": [
-        
-      ],
-      "officeUI": [
-        
-      ]
-    },
-    "partials": {
-      "styles": [
-        {"id": "core-list-styles", "path": "core/partials/styles/core-list-styles.xml", "status": "active"},
-        {"id": "core-toc-styles", "path": "core/partials/styles/core-toc-styles.xml", "status": "active"},
-        {"id": "core-latent-styles", "path": "core/partials/styles/core-latent-styles.xml", "status": "active"}
-      ],
-      "numbering": [
-        {"id": "core-numbering", "path": "core/partials/numbering/core-numbering.xml", "status": "active"}
-      ]
+  "agency": "core",
+  "manifest_version": "1.0",
+  "generated": "2026-01-09T03:31:57Z",
+  "workspace": {
+    "category": "workspace",
+    "templates": {
+        "coreNormal": {
+          "name": "coreNormal",
+          "type": "word-doc-template",
+          "extension": ".dotm",
+          "src": "builds/core/workspace/coreNormal/src/coreNormal.dotm",
+          "status": "active",
+          "partials": {
+            "coreNormalBodyStyles": "builds/core/workspace/coreNormal/partials/styles/core-normal-body-styles.xml",
+            "coreNormalCalloutStyles": "builds/core/workspace/coreNormal/partials/styles/core-normal-callout-styles.xml",
+            "coreNormalCaptionStyles": "builds/core/workspace/coreNormal/partials/styles/core-normal-caption-styles.xml",
+            "coreNormalCharacterStyles": "builds/core/workspace/coreNormal/partials/styles/core-normal-character-styles.xml",
+            "coreNormalDefaultStyles": "builds/core/workspace/coreNormal/partials/styles/core-normal-default-styles.xml",
+            "coreNormalDocDefaultStyles": "builds/core/workspace/coreNormal/partials/styles/core-normal-doc-default-styles.xml",
+            "coreNormalFooterStyles": "builds/core/workspace/coreNormal/partials/styles/core-normal-footer-styles.xml",
+            "coreNormalFrontMatterStyles": "builds/core/workspace/coreNormal/partials/styles/core-normal-front-matter-styles.xml",
+            "coreNormalHeaderStyles": "builds/core/workspace/coreNormal/partials/styles/core-normal-header-styles.xml",
+            "coreNormalHeadingStyles": "builds/core/workspace/coreNormal/partials/styles/core-normal-heading-styles.xml",
+            "coreNormalIndexStyles": "builds/core/workspace/coreNormal/partials/styles/core-normal-index-styles.xml",
+            "coreNormalListStyles": "builds/core/workspace/coreNormal/partials/styles/core-normal-list-styles.xml",
+            "coreNormalOtherStyles": "builds/core/workspace/coreNormal/partials/styles/core-normal-other-styles.xml",
+            "coreNormalTOCStyles": "builds/core/workspace/coreNormal/partials/styles/core-normal-toc-styles.xml",
+            "coreNormalNumbering": "builds/core/workspace/coreNormal/partials/numbering/core-normal-numbering.xml"
+          }
+        }
     }
+  },
+  "templates": {
+    "category": "templates",
+    "templates": {
+        "coreCommitteeLetterheaad": {
+          "name": "coreCommitteeLetterheaad",
+          "type": "word-doc-template",
+          "extension": ".dotm",
+          "src": "builds/core/templates/coreCommitteeLetterheaad/src/committee_template.dotm",
+          "status": "active"
+        },
+        "coreContract": {
+          "name": "coreContract",
+          "type": "word-doc-template",
+          "extension": ".dotm",
+          "src": "builds/core/templates/coreContract/out/contract.dotm",
+          "status": "active"
+        }
+    }
+  },
+  "system": {
+    "category": "system",
+    "scripts": {}
+  },
+  "assets": {
+    "category": "assets",
+    "deployment": {}
   }
 }

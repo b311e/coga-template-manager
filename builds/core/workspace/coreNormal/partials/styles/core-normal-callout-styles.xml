@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<snippet id="coreNormalCalloutStyles"
+    xmlns:w="http://schemas.openxmlformats.org/wordprocessingml/2006/main">
+    <w:style w:type="paragraph" w:styleId="BlockText">
+        <w:name w:val="Block Text"/>
+        <w:basedOn w:val="Normal"/>
+        <w:uiPriority w:val="30"/>
+        <w:semiHidden/>
+        <w:pPr>
+            <w:keepNext />
+            <w:keepLines />
+            <w:pBdr>
+                <w:top w:val="single" w:sz="4" w:space="6" w:themeColor="accent6" w:themeTint="66"/>
+                <w:left w:val="single" w:sz="4" w:space="6" w:themeColor="accent6" w:themeTint="66"/>
+                <w:bottom w:val="single" w:sz="4" w:space="6" w:themeColor="accent6" w:themeTint="66"/>
+                <w:right w:val="single" w:sz="4" w:space="6" w:themeColor="accent6" w:themeTint="66"/>
+            </w:pBdr>
+            <w:spacing w:before="240" w:after="240"/>
+            <w:ind w:left="288" w:right="288"/>
+            <w:contextualSpacing/>
+        </w:pPr>
+    </w:style>
+    <w:style w:type="paragraph" w:styleId="IntenseQuote">
+        <w:name w:val="Intense Quote"/>
+        <w:basedOn w:val="Normal"/>
+        <w:next w:val="Normal"/>
+        <w:uiPriority w:val="30"/>
+        <w:semiHidden/>
+        <w:pPr>
+            <w:pBdr>
+                <w:top w:val="single" w:sz="4" w:space="6" w:themeColor="accent6" w:themeTint="99"/>
+                <w:bottom w:val="single" w:sz="4" w:space="6" w:themeColor="accent6" w:themeTint="99"/>
+            </w:pBdr>
+            <w:spacing w:before="240" w:after="240"/>
+            <w:ind w:left="288" w:right="288"/>
+            <w:contextualSpacing/>
+        </w:pPr>
+        <w:rPr>
+            <w:color w:themeColor="accent1"/>
+        </w:rPr>
+    </w:style>
+</snippet>

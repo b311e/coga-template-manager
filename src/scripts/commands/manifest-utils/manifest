@@ -33,62 +33,8 @@ case "$script_base" in
         ;;
 esac
 
-generate_manifest() {
-    # Entry point: manifest generate <agency> (or pass 'core' to generate core manifest)
-    local agency="$1"
-    if [[ "$agency" == "core" ]]; then
-        generate_core_manifest
-        return $?
-    fi
-
-    if [[ -z "$agency" ]]; then
-        echo "Usage: manifest generate agency <agency>"
-        return 1
-    fi
-
-
-
-    local timestamp=$(date -u +"%Y-%m-%dT%H:%M:%SZ")
-    local agency_dir="$PROJECT_ROOT/builds/$agency"
-    local manifests_dir="$agency_dir/manifests"
-    local manifest_file="$manifests_dir/manifest.json"
-
-
-    if [[ ! -d "$agency_dir" ]]; then
-        echo "Error: Agency directory not found: $agency_dir"
-        return 1
-    fi
-
-    echo "Generating manifest for agency: $agency"
-    echo "Scanning directory: $agency_dir"
-    echo "Updating timestamp: $timestamp"
-
-    # ensure manifests directory exists
-    mkdir -p "$manifests_dir"
-
-    # Create initial manifest file if it doesn't exist
-    if [[ ! -f "$manifest_file" ]]; then
-        echo "Creating new manifest file: $manifest_file"
-        cat > "$manifest_file" << EOF
-{
-  "agency": "$agency",
-  "manifest_version": "1.0",
-  "generated": "$timestamp",
-  "workspace": { "category": "workspace", "templates": {} },
-  "templates": { "category": "templates", "templates": {} },
-  "system": { "category": "system", "scripts": {} },
-  "assets": { "category": "assets", "deployment": {} }
-}
-EOF
-    fi
-
-    templates_json=""
-    workspace_json=""
-    first_entry_templates=true
-    first_entry_workspace=true
-
-
 # Helper to process a parent folder (templates or workspace)
+# Uses global variables: templates_json, workspace_json, first_entry_templates, first_entry_workspace, manifest_file
 process_templates_dir() {
     local parent_dir="$1"
     local is_workspace="$2"
@@ -147,7 +93,7 @@ process_templates_dir() {
         fi
 
         # Get existing status from manifest if it exists
-        status=$(grep -A 10 "\"$key\"" "$manifest_file" | grep '"status"' | head -n1 | sed 's/.*"status": *"\([^"]*\)".*/\1/')
+        status=$(grep -A 10 "\"$key\"" "$manifest_file" 2>/dev/null | grep '"status"' | head -n1 | sed 's/.*"status": *"\([^"]*\)".*/\1/')
         [[ -z "$status" ]] && status="active"
 
         # Scan for partials
@@ -222,6 +168,60 @@ process_templates_dir() {
     done
 }
 
+generate_manifest() {
+    # Entry point: manifest generate <agency> (or pass 'core' to generate core manifest)
+    local agency="$1"
+    if [[ "$agency" == "core" ]]; then
+        generate_core_manifest
+        return $?
+    fi
+
+    if [[ -z "$agency" ]]; then
+        echo "Usage: manifest generate agency <agency>"
+        return 1
+    fi
+
+
+
+    local timestamp=$(date -u +"%Y-%m-%dT%H:%M:%SZ")
+    local agency_dir="$PROJECT_ROOT/builds/$agency"
+    local manifests_dir="$agency_dir/manifests"
+    local manifest_file="$manifests_dir/manifest.json"
+
+
+    if [[ ! -d "$agency_dir" ]]; then
+        echo "Error: Agency directory not found: $agency_dir"
+        return 1
+    fi
+
+    echo "Generating manifest for agency: $agency"
+    echo "Scanning directory: $agency_dir"
+    echo "Updating timestamp: $timestamp"
+
+    # ensure manifests directory exists
+    mkdir -p "$manifests_dir"
+
+    # Create initial manifest file if it doesn't exist
+    if [[ ! -f "$manifest_file" ]]; then
+        echo "Creating new manifest file: $manifest_file"
+        cat > "$manifest_file" << EOF
+{
+  "agency": "$agency",
+  "manifest_version": "1.0",
+  "generated": "$timestamp",
+  "workspace": { "category": "workspace", "templates": {} },
+  "templates": { "category": "templates", "templates": {} },
+  "system": { "category": "system", "scripts": {} },
+  "assets": { "category": "assets", "deployment": {} }
+}
+EOF
+    fi
+
+    templates_json=""
+    workspace_json=""
+    first_entry_templates=true
+    first_entry_workspace=true
+
     process_templates_dir "$agency_dir/templates" false
     process_templates_dir "$agency_dir/workspace" true
 
@@ -287,125 +287,80 @@ generate_partials() {
 }
 
 generate_core_manifest() {
-    local core_dir="$PROJECT_ROOT/core"
+    # Core manifest uses same structure as agency manifests
+    local core_dir="$PROJECT_ROOT/builds/core"
     local manifests_dir="$core_dir/manifests"
     local manifest_file="$manifests_dir/manifest.json"
-    mkdir -p "$manifests_dir"
     local timestamp=$(date -u +"%Y-%m-%dT%H:%M:%SZ")
-    
+
     if [[ ! -d "$core_dir" ]]; then
         echo "Error: Core directory not found: $core_dir"
         return 1
     fi
-    
+
     echo "Generating core manifest"
     echo "Scanning directory: $core_dir"
-    echo "Manifest file: $manifest_file"
-    
-    # Initialize category arrays
-    local base_normal=()
-    local base_theme=()
-    local base_sheet=()
-    local base_book=()
-    local base_colors=()
-    local base_fonts=()
-    local base_officeUI=()
-    local partials_styles=()
-    local partials_numbering=()
-    
-    # Collect all XML files in core/
-    while IFS= read -r -d '' file; do
-        local rel_path="${file#$PROJECT_ROOT/}"
-        local filename=$(basename "$file" .xml)
-        local category=""
-        local subcategory=""
-        
-        # Map path to category.subcategory
-        if [[ "$rel_path" == core/base/workspace/normal/* ]]; then
-            category="base"
-            subcategory="normal"
-        elif [[ "$rel_path" == core/base/workspace/theme/* ]]; then
-            category="base"
-            subcategory="theme"
-        elif [[ "$rel_path" == core/base/workspace/sheet/* ]]; then
-            category="base"
-            subcategory="sheet"
-        elif [[ "$rel_path" == core/base/workspace/book/* ]]; then
-            category="base"
-            subcategory="book"
-        elif [[ "$rel_path" == core/base/workspace/colors/* ]]; then
-            category="base"
-            subcategory="colors"
-        elif [[ "$rel_path" == core/base/workspace/fonts/* ]]; then
-            category="base"
-            subcategory="fonts"
-        elif [[ "$rel_path" == core/base/workspace/officeUI/* ]]; then
-            category="base"
-            subcategory="officeUI"
-        elif [[ "$rel_path" == core/partials/styles/* ]]; then
-            category="partials"
-            subcategory="styles"
-        elif [[ "$rel_path" == core/partials/numbering/* ]]; then
-            category="partials"
-            subcategory="numbering"
-        else
-            # Skip unknown paths
-            continue
-        fi
-        
-        local component="{\"id\": \"$filename\", \"path\": \"$rel_path\", \"status\": \"active\"}"
-        
-        # Add to appropriate array
-        case "$category.$subcategory" in
-            base.normal) base_normal+=("$component") ;;
-            base.theme) base_theme+=("$component") ;;
-            base.sheet) base_sheet+=("$component") ;;
-            base.book) base_book+=("$component") ;;
-            base.colors) base_colors+=("$component") ;;
-            base.fonts) base_fonts+=("$component") ;;
-            base.officeUI) base_officeUI+=("$component") ;;
-            partials.styles) partials_styles+=("$component") ;;
-            partials.numbering) partials_numbering+=("$component") ;;
-        esac
-    done < <(find "$core_dir" -name "*.xml" -print0)
-    
-    # Function to build JSON array from array
-    build_array() {
-        local arr=("$@")
-        local json=""
-        local first=true
-        for item in "${arr[@]}"; do
-            if $first; then
-                first=false
-            else
-                json+=",\n        "
-            fi
-            json+="$item"
-        done
-        echo -e "$json"
-    }
-    
-    # Build JSON
-    local json="{\n  \"generated\": \"$timestamp\",\n  \"core\": {\n    \"base\": {\n"
-    json+="      \"normal\": [\n        $(build_array "${base_normal[@]}")\n      ],\n"
-    json+="      \"theme\": [\n        $(build_array "${base_theme[@]}")\n      ],\n"
-    json+="      \"sheet\": [\n        $(build_array "${base_sheet[@]}")\n      ],\n"
-    json+="      \"book\": [\n        $(build_array "${base_book[@]}")\n      ],\n"
-    json+="      \"colors\": [\n        $(build_array "${base_colors[@]}")\n      ],\n"
-    json+="      \"fonts\": [\n        $(build_array "${base_fonts[@]}")\n      ],\n"
-    json+="      \"officeUI\": [\n        $(build_array "${base_officeUI[@]}")\n      ]\n"
-    json+="    },\n    \"partials\": {\n"
-    json+="      \"styles\": [\n        $(build_array "${partials_styles[@]}")\n      ],\n"
-    json+="      \"numbering\": [\n        $(build_array "${partials_numbering[@]}")\n      ]\n"
-    json+="    }\n  }\n}"
-    
+    echo "Updating timestamp: $timestamp"
 
-    # Write to file
-    echo -e "$json" > "$manifest_file"
-    
-    local total=$(( ${#base_normal[@]} + ${#base_theme[@]} + ${#base_sheet[@]} + ${#base_book[@]} + ${#base_colors[@]} + ${#base_fonts[@]} + ${#base_officeUI[@]} + ${#partials_styles[@]} + ${#partials_numbering[@]} ))
-    echo "✓ Core manifest generated: $manifest_file"
-    echo "  Found $total components across categories"
+    # ensure manifests directory exists
+    mkdir -p "$manifests_dir"
+
+    # Create initial manifest file if it doesn't exist
+    if [[ ! -f "$manifest_file" ]]; then
+        echo "Creating new manifest file: $manifest_file"
+        cat > "$manifest_file" << EOF
+{
+  "agency": "core",
+  "manifest_version": "1.0",
+  "generated": "$timestamp",
+  "workspace": { "category": "workspace", "templates": {} },
+  "templates": { "category": "templates", "templates": {} },
+  "system": { "category": "system", "scripts": {} },
+  "assets": { "category": "assets", "deployment": {} }
+}
+EOF
+    fi
+
+    templates_json=""
+    workspace_json=""
+    first_entry_templates=true
+    first_entry_workspace=true
+
+    # Process workspace and templates directories using the same logic as agency manifests
+    process_templates_dir "$core_dir/templates" false
+    process_templates_dir "$core_dir/workspace" true
+
+    # Build the complete JSON structure
+    cat > "$manifest_file" << EOF
+{
+  "agency": "core",
+  "manifest_version": "1.0",
+  "generated": "$timestamp",
+  "workspace": {
+    "category": "workspace",
+    "templates": {
+$(echo -e "$workspace_json")
+    }
+  },
+  "templates": {
+    "category": "templates",
+    "templates": {
+$(echo -e "$templates_json")
+    }
+  },
+  "system": {
+    "category": "system",
+    "scripts": {}
+  },
+  "assets": {
+    "category": "assets",
+    "deployment": {}
+  }
+}
+EOF
+    echo "✓ Templates and workspace sections updated in manifest."
+    echo ""
+    echo "✓ Manifest updated: $manifest_file"
 }
 
 generate_all() {
