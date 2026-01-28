@@ -2,7 +2,7 @@
 
 ## 2025-01-27
 
-### partials updates
+"### partials updates
 - [x] change "snippet id" to "partial name" in partial.xml
 - [x] change file naming for partials from kabob-case to snake_case
 - [x] partial name should not include "styles" anymore. Need to remove this from the pattern entirely. The naming convention for partial_name is: [agency][Template][StyleGroup] 
@@ -33,7 +33,7 @@
 
 ### src/shells updates
 - [x] created src/shells folder, moved all shells to this folder, and created new ones (_config_build.json, config_styles.json, sonfig_fields.json)
-- [x] created partials/styles shell folder and front_matter.xml
+- [x] created partials/styles shell folder and front_matter.xml"
 
 ### To do:
 
