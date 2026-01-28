@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<snippet id="coreAuthorFieldCode" target="document"
+<partial id="coreAuthorFieldCode" target="document"
     xmlns:w="http://schemas.openxmlformats.org/wordprocessingml/2006/main">
     <w:r>
         <w:fldChar w:fldCharType="begin"/>
@@ -10,4 +10,4 @@
     <w:r>
         <w:fldChar w:fldCharType="end"/>
     </w:r>
-</snippet>
+</partial>

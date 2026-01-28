@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<partial type="styles" agency="" template="" name="front_matter">
+<w:styles xmlns:w="http://schemas.openxmlformats.org/wordprocessingml/2006/main">
+    <w:style w:type="paragraph" w:styleId="Title">
+        <w:name w:val="Title"/>
+        <w:basedOn w:val="Normal"/>
+        <w:next w:val="Normal"/>
+        <w:uiPriority w:val="99"/>
+        <w:semiHidden />
+        <w:pPr>
+            <w:spacing w:after="360" w:line="240" w:lineRule="auto" />
+        </w:pPr>
+        <w:rPr>
+            <w:rFonts w:asciiTheme="majorHAnsi" w:eastAsiaTheme="majorEastAsia" w:hAnsiTheme="majorHAnsi" w:csTheme="majorBidi" />
+            <w:b />
+            <w:color w:themeColor="accent1" />
+            <w:sz w:val="64" />
+            <w:szCs w:val="64" />
+        </w:rPr>
+    </w:style>
+    <w:style w:type="paragraph" w:styleId="Subtitle">
+        <w:name w:val="Subtitle" />
+        <w:basedOn w:val="Normal" />
+        <w:next w:val="Normal" />
+        <w:semiHidden />
+        <w:uiPriority w:val="4" />
+        <w:pPr>
+            <w:keepNext/>
+            <w:keepLines/>
+            <w:suppressAutoHyphens/>
+            <w:spacing w:after="260" />
+            <w:contextualSpacing />
+        </w:pPr>
+        <w:rPr>
+            <w:rFonts w:asciiTheme="majorHAnsi" w:eastAsiaTheme="minorEastAsia" w:hAnsiTheme="majorHAnsi"/>
+            <w:color w:themeColor="text1" w:themeTint="A5"/>
+            <w:sz w:val="44" />
+        </w:rPr>
+    </w:style>
+</partial>

@@ -1,0 +1,68 @@
+{
+  "config_type": "styles",
+  "agency": "",
+  "template": "",
+  "description": "Used to configure the source of style partials imported into a template.",
+  "style_groups": {
+    "doc_default": {
+      "agency": "",
+      "template": ""
+    },
+    "default": {
+      "agency": "",
+      "template": ""
+    },
+    "heading": {
+      "agency": "",
+      "template": ""
+    },
+    "body": {
+      "agency": "",
+      "template": ""
+    },
+    "front_matter": {
+      "agency": "",
+      "template": ""
+    },
+    "list": {
+      "agency": "",
+      "template": ""
+    },
+    "callout": {
+      "agency": "",
+      "template": ""
+    },
+    "caption": {
+      "agency": "",
+      "template": ""
+    },
+    "toc": {
+      "agency": "",
+      "template": ""
+    },
+    "index": {
+      "agency": "",
+      "template": ""
+    },
+    "header": {
+      "agency": "",
+      "template": ""
+    },
+    "footer": {
+      "agency": "",
+      "template": ""
+    },
+    "other": {
+      "agency": "",
+      "template": ""
+    },
+    "character": {
+      "agency": "",
+      "template": ""
+    },
+    "table": {
+      "agency": "",
+      "template": ""
+    }
+  }
+}

@@ -1,6 +1,57 @@
 # Updates and Future Tasks
 
+## 2025-01-27
 
+### partials updates
+- [x] change "snippet id" to "partial name" in partial.xml
+- [x] change file naming for partials from kabob-case to snake_case
+- [x] partial name should not include "styles" anymore. Need to remove this from the pattern entirely. The naming convention for partial_name is: [agency][Template][StyleGroup] 
+
+### config (main build config file) updates
+- [x] located in builds/agency/templateName/config
+- [x] delete "id" field
+- [x] move "extension" above "status"
+
+### style-map, now config_styles updates
+- [x] changed "style-map.yaml" to "config_styles.json"
+- [x] config_styles.json will always be: templateName/config/config_styles.json"
+- [x] the "partials" fields determine the source partial to import into the template. 
+    - [x] "agency" targets the agency (folder name under builds/)
+    - [x] "template" targets the template (folder name under builds/agency/ in pascalCase).
+    - note: i am not sold on this naming convention.
+- [x] config_styles schema is located in src/_config_styles.json
+
+### schemas updates
+- [x] moved .templx/schemas to src/schemas
+- [x] renamed schemas/manifest-schema to schemas/manifest_schema.json
+- [x] updated fields in manifest_schema.json
+    - [x] template_entry is now build_entry
+- [x] created build_types_manifest.json
+    - [x] renamed "system" build_type to "dist"
+- [x] created config_types_manifest.json
+- [x] created style_groups_schema.json
+
+### src/shells updates
+- [x] created src/shells folder, moved all shells to this folder, and created new ones (_config_build.json, config_styles.json, sonfig_fields.json)
+- [x] created partials/styles shell folder and front_matter.xml
+
+### To do:
+
+- [ ] fix src/shells/config_fields.json to have template-specific fields for committee_templates (to reference collection field in committee templates?)
+- [ ] create all other style partials shell files
+- [ ] update other fields in schemas to flow with new system
+- [ ] update manifest scripts to continue generate schemas in .templx/schemas, but reference the schemas under src/schemas
+- [ ] make sure this schema is correct and follows best practices
+- [ ] config_styles script must rely on the order in the json, rather than the old style-map-order-of-operations document.
+- [ ] update scripts so config_styles.json is used to configure the source of style partials imported into a template.
+- [ ] update scripts so the "config_type" field determines the type of config file (styles, numbering, macros, document, etc.) and therefore the target (referenced in the src/schemas).
+- [ ] clean up the docs folders
+- [ ] update the main README
+- [ ] standardize naming conventions. i want to move to underscores (_), but need to make sure that makes sense everywhere
+- [ ] figure out config_styles field names (style_group vs styles vs partials, etc.)
+
+
+## DATE?????
 
 src > scripts
 
@@ -25,7 +76,6 @@ manifests & naming
 - [ ] update taxonomy
       - remove agency from the top
       - remove manifest_version
-      - 
       - templates --> builds (space > builds)
       - name --> build_name
       - type --> build_type

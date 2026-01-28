@@ -124,10 +124,10 @@ create-snippet-styles <source-expanded-folder> <snippet-id> <style-id>,<style-id
 #### Snippet IDs
 
 Snippet Ids should be unique, camel case, and follow this naming convention: 
-`[scope][Template][StyleGroup][SnippetType]`.
+`[agency][Template][StyleGroup][SnippetType]`.
 
-   - `scope` = core or agency (jbc, olls, lcs, etc.)
-   - `Template` = The name of the template the snippet comes from, without the agency (e.g., Normal, AuditReport, etc.).
+   - `agency` = core or agency (jbc, olls, lcs, etc.)
+   - `Template` = The name of the template the snippet comes from (e.g., Normal, AuditReport, etc.).
    - `StyleGroup` = The group the style belongs to. See [docs/snippets-order-of-operations.yml](docs/snippets-order-of-operations.yml)
    - `SnippetType` = The type of snippet it is (styles, numbering, etc.)
 

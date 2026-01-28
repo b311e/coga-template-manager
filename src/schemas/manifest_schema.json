@@ -7,15 +7,15 @@
   "definitions": {
     "template_types": {
       "enum": [
-        "excel-book-template",
-        "excel-sheet-template", 
-        "excel-book",
-        "word-doc-template",
-        "word-doc"
+        "excel_book_template",
+        "excel_sheet_template", 
+        "excel_book",
+        "word_doc_template",
+        "word_doc"
       ]
     },
     
-    "status_values": {
+    "status": {
       "enum": [
         "active",
         "planned", 
@@ -24,18 +24,16 @@
       ]
     },
     
-    "categories": {
+    "build_type": {
       "enum": [
         "workspace",
-        "templates",
-        "system", 
-        "assets",
-        "data",
-        "core"
+        "template",
+        "dist", 
+        "asset"
       ]
     },
     
-    "template_entry": {
+    "build_entry": {
       "type": "object",
       "required": ["name", "type", "extension", "status"],
       "properties": {
@@ -43,8 +41,8 @@
           "type": "string",
           "description": "Human-readable name of the template"
         },
-        "type": {
-          "$ref": "#/definitions/template_types"
+        "build_type": {
+          "$ref": "#/definitions/build_types"
         },
         "extension": {
           "type": "string",
@@ -67,7 +65,28 @@
           "description": "Path to documentation directory"
         },
         "status": {
-          "$ref": "#/definitions/status_values"
+          "$ref": "#/definitions/status"
+        },
+        {
+          "date_created": {
+            "type": "string",
+            "format": "",
+            "description": "ISO 8601 timestamp of template creation"
+          }
+        },
+        {
+          "date_modified": {
+            "type": "string",
+            "format": "",
+            "description": "ISO 8601 timestamp of template creation"
+          }
+        },
+        {
+          "date_modified": {
+            "type": "string",
+            "format": "",
+            "description": "ISO 8601 timestamp of template creation"
+          }
         }
       }
     }

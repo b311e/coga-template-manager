@@ -1,0 +1,20 @@
+{
+    "title": "templx Config Types Schema",
+    "version": "1.0",
+    "description": "Schema defining configuration types for templx system.",
+    "config_types": [
+        {
+        "config_type": "build",
+        "description": "Configuration for the build."
+        },
+        {
+        "config_type": "fields",
+        "description": "Configuration fields for document templates."
+        },
+        {
+        "config_type": "styles",
+        "description": "Style configurations for document templates.",
+        "target": "word/styles.xml"
+        }
+    ]
+}
