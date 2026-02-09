@@ -3,7 +3,7 @@
 # Run this with: source setup_aliases.sh
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-SCRIPTS_PATH="$SCRIPT_DIR/.."
+SCRIPTS_PATH="$SCRIPT_DIR/../.."
 BIN_PATH="$SCRIPTS_PATH/bin"
 
 # Add to PATH if not already there (prefer bin/ so top-level names map to wrapper scripts)
