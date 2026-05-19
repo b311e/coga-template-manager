@@ -1,7 +1,5 @@
 #!/usr/bin/env bash
-# Create Style Snippet Script
-# Usage: create-snippet-style <expanded-folder-path> <snippet-name> <style-id1>,<style-id2>,...
-# Extracts specified styles from a template and saves them as a snippet file
+# templx style extract - extract specified styles into a partial snippet file
 
 set -euo pipefail
 
@@ -20,21 +18,21 @@ normalize_path() {
 }
 
 show_help() {
-    echo "Usage: create-snippet-style <expanded-folder-path> <snippet-name> <style-id1>,<style-id2>,..."
+    echo "Usage: templx style extract <expanded-folder-path> <snippet-name> <style-id1>,<style-id2>,..."
     echo ""
-    echo "Create a style snippet file from specific styles in an unpacked template"
+    echo "Extract specific styles from an unpacked template into a partial snippet file"
     echo ""
     echo "Arguments:"
     echo "  expanded-folder-path - Path to expanded template folder (in/ or expanded/)"
-    echo "  snippet-name         - Name for the snippet file (e.g., 'custom-headings')"
+    echo "  snippet-name         - Name for the snippet file (e.g., 'custom_headings')"
     echo "  style-ids            - Comma-separated list of style IDs to extract"
     echo ""
     echo "Output:"
     echo "  Snippet saved to <template-dir>/partials/styles/<snippet-name>.xml"
     echo ""
     echo "Examples:"
-    echo "  create-snippet-style builds/jbc/workspace/jbcNormal/in mySnippet Heading1,Heading2,Title"
-    echo "  create-snippet-style expanded/ custom-styles Normal,BodyText,Caption"
+    echo "  templx style extract builds/jbc/workspace/jbcNormal/in heading_styles Heading1,Heading2,Title"
+    echo "  templx style extract expanded/ custom_body Normal,BodyText,Caption"
     exit 0
 }
 

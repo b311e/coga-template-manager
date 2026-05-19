@@ -1,10 +1,8 @@
 #!/usr/bin/env python3
 """
-style_import - import styles from partial snippets according to a mapping file
+templx style import map - import styles from partial snippets according to a mapping file
 
-Usage: style_import <target-styles-xml> [--mapping docs/style-mapping.yml] [--dry-run] [--replace]
-
-Naming: wrapper command is `style-import`; script filename is `style_import`.
+Usage: templx style import map <target-styles-xml> [--mapping docs/style-mapping.yml] [--dry-run] [--replace]
 """
 import argparse
 import os
@@ -12,10 +10,46 @@ import re
 import json
 import shutil
 import xml.etree.ElementTree as ET
+import copy
 # Preserve common Word namespaces so written XML uses `w:` etc.
 ET.register_namespace('w', 'http://schemas.openxmlformats.org/wordprocessingml/2006/main')
 ET.register_namespace('mc', 'http://schemas.openxmlformats.org/markup-compatibility/2006')
 ET.register_namespace('r', 'http://schemas.openxmlformats.org/officeDocument/2006/relationships')
+# Additional Word namespaces that may appear in mc:Ignorable — register so they can be emitted
+ET.register_namespace('w14', 'http://schemas.microsoft.com/office/word/2010/wordml')
+ET.register_namespace('w15', 'http://schemas.microsoft.com/office/word/2012/wordml')
+ET.register_namespace('w16se', 'http://schemas.microsoft.com/office/word/2015/wordml/symex')
+ET.register_namespace('w16cid', 'http://schemas.microsoft.com/office/word/2016/wordml/cid')
+ET.register_namespace('w16', 'http://schemas.microsoft.com/office/word/2018/wordml')
+ET.register_namespace('w16cex', 'http://schemas.microsoft.com/office/word/2015/wordml/cex')
+ET.register_namespace('w16sdtdh', 'http://schemas.microsoft.com/office/word/2021/wordml/sdtdefhash')
+
+def normalize_path(path_str):
+    r"""
+    Normalize path to work cross-platform.
+    Handles:
+    - Windows paths: C:\Users\... or C:/Users/...
+    - Git Bash paths: /c/Users/...
+    - Mac/Linux paths: /Users/... or /home/...
+    """
+    if not path_str:
+        return path_str
+
+    # Convert all backslashes to forward slashes for uniform handling
+    normalized = path_str.replace('\\', '/')
+
+    # Convert Git Bash style paths (/c/...) to Windows style on Windows
+    if os.name == 'nt':
+        # Match patterns like /c/Users or /d/Projects
+        import re
+        match = re.match(r'^/([a-zA-Z])(/.*)', normalized)
+        if match:
+            drive = match.group(1).upper()
+            rest = match.group(2)
+            normalized = f'{drive}:{rest}'
+
+    # Use os.path.normpath to handle the rest (removes redundant separators, etc.)
+    return os.path.normpath(normalized)
 
 def parse_mapping_text(path):
     """Parse a simple mapping file that contains repeated blocks like:
@@ -94,6 +128,22 @@ def load_partials_manifests(repo_root):
     return partials
 
 def find_partial_snippet(manifests, template_name, style_group, preferred_agency=None, preferred_parent=None):
+    """
+    Find a partial snippet matching the template_name and style_group.
+
+    New format (from agency manifests):
+    - id: partial file name (e.g. "osa-normal-default-styles")
+    - path: relative path to the partial
+    - template: template name (e.g. "osaNormal")
+    - agency: agency code (e.g. "osa")
+    - category: "workspace" or "templates"
+
+    Legacy format (from partials-manifest.json):
+    - id: partial identifier
+    - path: relative path
+    - tags: list of tags
+    - target: target type
+    """
     tn = (template_name or '').lower()
     sg = (style_group or '').lower()
 
@@ -108,53 +158,67 @@ def find_partial_snippet(manifests, template_name, style_group, preferred_agency
         return False
 
     def is_style_partial(partial):
-        if partial.get('partial_type') == 'styles':
-            return True
+        """Check if partial is a styles partial (not numbering)."""
+        pid = (partial.get('id') or '').lower()
         path = (partial.get('path') or '').lower()
-        return '/styles/' in path
+        # New format: check if it's in styles folder or has 'styles' in id
+        if '/styles/' in path:
+            return True
+        # Legacy format: check tags and target
+        tags = [t.lower() for t in partial.get('tags') or []]
+        target = (partial.get('target') or '').lower()
+        return 'styles' in tags or 'word:styles' in target
 
-    # Strong match: template, style group, preferred agency/parent
+    # Strategy 1: Match template name and style group with preferred agency/parent
     for s in manifests:
         if not is_style_partial(s):
             continue
         sid = (s.get('id') or '').lower()
         template = (s.get('template') or '').lower()
         path = s.get('path') or ''
+
+        # Match by template name in new format
         if template and template == tn and sg in sid and path_matches_preference(path):
             return path
+        # Match by id for legacy format
         if tn and tn in sid and sg in sid and path_matches_preference(path):
             return path
 
-    # Match template and style group (any agency)
+    # Strategy 2: Match template name and style group (any agency)
     for s in manifests:
         if not is_style_partial(s):
             continue
         sid = (s.get('id') or '').lower()
         template = (s.get('template') or '').lower()
+
+        # Match by template name in new format
         if template and template == tn and sg in sid:
             return s.get('path')
+        # Match by id for legacy format
         if tn and tn in sid and sg in sid:
             return s.get('path')
 
-    # Match just template with preferred agency/parent
+    # Strategy 3: Match just template name with preferred agency/parent
     for s in manifests:
         if not is_style_partial(s):
             continue
         sid = (s.get('id') or '').lower()
         template = (s.get('template') or '').lower()
         path = s.get('path') or ''
+
         if path_matches_preference(path):
             if template and template == tn:
                 return path
             if tn and tn in sid:
                 return path
 
-    # Fallback: match just template name (any agency)
+    # Strategy 4: Match just template name (any agency)
     for s in manifests:
         if not is_style_partial(s):
             continue
         sid = (s.get('id') or '').lower()
         template = (s.get('template') or '').lower()
+
         if template and template == tn:
             return s.get('path')
         if tn and tn in sid:
@@ -176,24 +240,57 @@ def extract_styles_from_snippet(snippet_path, repo_root):
     styles = []
     for style in root.findall('.//{http://schemas.openxmlformats.org/wordprocessingml/2006/main}style'):
         sid = style.get('{http://schemas.openxmlformats.org/wordprocessingml/2006/main}styleId')
-        styles.append((sid, style))
+        # collect display name and aliases to allow matching by either styleId or name
+        names = []
+        if sid:
+            names.append(sid)
+        # w:name element (display name)
+        name_el = style.find('.//{http://schemas.openxmlformats.org/wordprocessingml/2006/main}name')
+        if name_el is not None:
+            name_val = name_el.get('{http://schemas.openxmlformats.org/wordprocessingml/2006/main}val') or name_el.get('val')
+            if name_val:
+                names.append(name_val)
+        # w:aliases element may contain comma-separated names
+        aliases_el = style.find('.//{http://schemas.openxmlformats.org/wordprocessingml/2006/main}aliases')
+        if aliases_el is not None:
+            alias_val = aliases_el.get('{http://schemas.openxmlformats.org/wordprocessingml/2006/main}val') or aliases_el.get('val')
+            if alias_val:
+                for a in re.split(r"\s*,\s*", alias_val):
+                    if a:
+                        names.append(a)
+        styles.append((sid, style, names))
     return styles
 
 def main():
-    parser = argparse.ArgumentParser(prog='style_import')
+    parser = argparse.ArgumentParser(prog='templx style import map')
     parser.add_argument('target', help='target styles.xml to modify')
-    parser.add_argument('--mapping', default='docs/style-mapping.yml')
-    parser.add_argument('--styles-order', default=os.path.join('src','schemas','style-map-schema.yml'))
+    # default mapping filename changed to `style-map.yml`; keep compatibility with `style-mapping.yml`
+    parser.add_argument('--mapping', default='docs/style-map.yml')
+    # Default styles-order will be set after determining repo_root
+    parser.add_argument('--styles-order', default=None)
     parser.add_argument('--dry-run', action='store_true')
     parser.add_argument('--replace', action='store_true', help='Replace existing styles with same id')
     parser.add_argument('--backup', action='store_true', dest='backup', help='Create a .bak backup before writing (disabled by default)')
     args = parser.parse_args()
 
-    repo_root = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '..', '..'))
+    # Normalize the target path to work cross-platform
+    args.target = normalize_path(args.target)
+
+    # Only normalize mapping if it's an absolute path (user-provided)
+    # Don't normalize if it's the default relative path used for auto-discovery
+    if args.mapping and os.path.isabs(args.mapping):
+        args.mapping = normalize_path(args.mapping)
+
+    repo_root = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '..', '..', '..', '..'))
+
+    # Set default styles-order using absolute path from repo_root
+    if args.styles_order is None:
+        args.styles_order = os.path.join(repo_root, 'src', 'schemas', 'style-map-schema.yml')
 
     # Auto-discover mapping file: if the provided mapping doesn't exist or
     # the user relied on the default, search upward from the target for
-    # a `docs/style-mapping.yml` next to the template (e.g., builds/<agency>/<template>/docs/...)
+    # a `docs/style-map.yml` (preferred) or the legacy `docs/style-mapping.yml` next to the template
+    # (e.g., builds/<agency>/<template>/docs/...)
     if not os.path.isabs(args.mapping):
         mapping_candidate = os.path.join(os.getcwd(), args.mapping)
     else:
@@ -205,9 +302,13 @@ def main():
         found = None
         repo_root_abs = os.path.abspath(repo_root)
         while True:
-            candidate = os.path.join(cur, 'docs', 'style-mapping.yml')
-            if os.path.exists(candidate):
-                found = candidate
+            candidate1 = os.path.join(cur, 'docs', 'style-map.yml')
+            candidate2 = os.path.join(cur, 'docs', 'style-mapping.yml')
+            if os.path.exists(candidate1):
+                found = candidate1
+                break
+            if os.path.exists(candidate2):
+                found = candidate2
                 break
             if os.path.abspath(cur) == repo_root_abs or cur == os.path.dirname(cur):
                 break
@@ -282,7 +383,16 @@ def main():
             print(f"Warning: no partial snippet found for partial='{partial}' group='{group_key}'")
             continue
         styles = extract_styles_from_snippet(snippet_path, repo_root)
-        styles_dict = { (s[0] or '').lower(): s[1] for s in styles }
+        # Build a lookup by multiple possible keys: styleId, display name, aliases
+        styles_dict = {}
+        for s in styles:
+            sid = s[0]
+            elem = s[1]
+            names = s[2] if len(s) > 2 else []
+            for key_name in names:
+                if key_name:
+                    styles_dict[key_name.lower()] = elem
+
         for name in style_names:
             sid = name
             if sid is None:
@@ -293,6 +403,20 @@ def main():
             else:
                 # not found in this snippet
                 pass
+
+        # Also import any additional styles present in the snippet that were
+        # not explicitly requested by styles-order. Preserve their snippet
+        # order and avoid duplicates.
+        existing = { (i[0] or '').lower() for i in import_list }
+        for s in styles:
+            s_sid = (s[0] or '')
+            s_elem = s[1]
+            if not s_sid:
+                continue
+            if s_sid.lower() in existing:
+                continue
+            import_list.append((s_sid, s_elem, snippet_path))
+            existing.add(s_sid.lower())
 
     if args.dry_run:
         print('Dry run: will import the following styles in order:')
@@ -311,6 +435,24 @@ def main():
         backup_created = True
     tree = ET.parse(args.target)
     root = tree.getroot()
+    # If the original styles part declares `mc:Ignorable`, ensure the matching
+    # `xmlns:prefix` attributes are present for those prefixes so Word accepts
+    # the `mc:Ignorable` list. If no ignorable is present, fall back to adding
+    # common Word prefixes so output remains compatible with recent Word features.
+    mc_ignorable_attr = '{http://schemas.openxmlformats.org/markup-compatibility/2006}Ignorable'
+    ignorable_val = root.get(mc_ignorable_attr)
+    known_ns = {
+        'w14': 'http://schemas.microsoft.com/office/word/2010/wordml',
+        'w15': 'http://schemas.microsoft.com/office/word/2012/wordml',
+        'w16se': 'http://schemas.microsoft.com/office/word/2015/wordml/symex',
+        'w16cid': 'http://schemas.microsoft.com/office/word/2016/wordml/cid',
+        'w16': 'http://schemas.microsoft.com/office/word/2018/wordml',
+        'w16cex': 'http://schemas.microsoft.com/office/word/2015/wordml/cex',
+        'w16sdtdh': 'http://schemas.microsoft.com/office/word/2021/wordml/sdtdefhash'
+    }
+    # Note: do not set xmlns attributes via ElementTree here — some parsers
+    # produce transient nsN bindings. We'll inject missing xmlns:prefix
+    # declarations into the serialized start-tag later as a safe fallback.
     # ensure namespace
     for sid, elem, src in import_list:
         # check if exists
@@ -320,15 +462,62 @@ def main():
                 found = existing
                 break
         if found is not None:
-            if args.replace:
-                parent = root
-                parent.remove(found)
-            else:
-                continue
-        # append element (imported element may belong to a different tree)
-        root.append(elem)
+            # Always replace existing styles so partials override target styles
+            removed = False
+            for parent in root.iter():
+                for child in list(parent):
+                    if child is found:
+                        parent.remove(child)
+                        removed = True
+                        break
+                if removed:
+                    break
+            if not removed:
+                try:
+                    root.remove(found)
+                except Exception:
+                    pass
+        # append a deep-copy of the element so we don't move it out of the
+        # source snippet tree (prevents subtle reuse/mutation bugs)
+        root.append(copy.deepcopy(elem))
 
-    tree.write(args.target, encoding='utf-8', xml_declaration=True)
+    # ElementTree sometimes omits xmlns declarations for prefixes that only
+    # appear in attribute values (e.g., mc:Ignorable). As a robust fallback
+    # ensure the serialized root start-tag contains the xmlns:prefix entries
+    # for any prefixes we intend to declare.
+    # Determine prefixes to ensure (from ignorable or known_ns)
+    if ignorable_val:
+        prefixes_to_ensure = [p for p in re.split(r'\s+', ignorable_val.strip()) if p]
+    else:
+        prefixes_to_ensure = list(known_ns.keys())
+
+    # Serialize root to string. ElementTree may add transient nsN artifacts
+    # when manipulating xmlns attributes; perform a safe textual cleanup and
+    # inject only the missing xmlns:prefix declarations into the opening
+    # <w:styles> tag.
+    raw = ET.tostring(root, encoding='utf-8', method='xml').decode('utf-8')
+
+    # Remove any accidental nsN xmlns declarations and any nsN:pref attributes
+    raw = re.sub(r"\sxmlns:ns\d+=[\"]http://www.w3.org/2000/xmlns/[\"]", '', raw)
+    raw = re.sub(r"\sns\d+:[A-Za-z0-9_:-]+=\"[^\"]*\"", '', raw)
+
+    m = re.search(r'(<w:styles\b[^>]*>)', raw)
+    if m:
+        full_tag = m.group(1)  # includes trailing '>'
+        inner = full_tag[:-1]  # drop final '>' for manipulation
+        additions = ''
+        for p in prefixes_to_ensure:
+            if f'xmlns:{p}="' not in inner:
+                uri = known_ns.get(p)
+                if uri:
+                    additions += f' xmlns:{p}="{uri}"'
+        if additions:
+            new_tag = inner + additions + '>'
+            raw = raw[:m.start(1)] + new_tag + raw[m.end(1):]
+
+    with open(args.target, 'wb') as out:
+        out.write(b"<?xml version='1.0' encoding='utf-8'?>\n")
+        out.write(raw.encode('utf-8'))
     # Always report the write; include backup info only if created.
     if backup_created:
         print('Wrote', args.target, '(backup at', backup + ')')

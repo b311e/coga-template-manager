@@ -1,11 +1,10 @@
 #!/usr/bin/env bash
-# List Styles Script (renamed)
-# Usage: style_generate_list <templatePath>
+# templx style list - extract and list styles from an unpacked Word template
 
 set -euo pipefail
 
-if [[ "$1" == "help" || "$1" == "--help" || "$1" == "-h" ]] 2>/dev/null; then
-    echo "Usage: style-generate-list <expandedPath>"
+if [[ "${1:-}" == "help" || "${1:-}" == "--help" || "${1:-}" == "-h" ]]; then
+    echo "Usage: templx style list <expandedPath>"
     echo ""
     echo "Extract and list all styles from an unpacked Word template"
     echo ""
@@ -17,14 +16,14 @@ if [[ "$1" == "help" || "$1" == "--help" || "$1" == "-h" ]] 2>/dev/null; then
     echo "  Style list saved to docs/style-list-{templateName}.txt in template directory"
     echo ""
     echo "Examples:"
-    echo "  style-generate-list builds/jbc/workspace/jbcNormal/in"
-    echo "  style-generate-list C:/code/templx/builds/jbc/workspace/jbcNormal/in"
+    echo "  templx style list builds/jbc/workspace/jbcNormal/in"
+    echo "  templx style list C:/code/templx/builds/jbc/workspace/jbcNormal/in"
     exit 0
 fi
 
 if [ $# -eq 0 ]; then
-    echo "Usage: style-generate-list <expandedPath>"
-    echo "Run 'style-generate-list --help' for more information"
+    echo "Usage: templx style list <expandedPath>"
+    echo "Run 'templx style list --help' for more information"
     exit 1
 fi
 

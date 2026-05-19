@@ -1,0 +1,43 @@
+#!/usr/bin/env bash
+# templx style command dispatcher
+
+set -euo pipefail
+
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+SUBCOMMAND="${1:-}"
+
+show_help() {
+    cat <<EOF
+Usage: templx style <subcommand> [args...]
+
+Subcommands:
+  list <expanded-dir>                  - List styles in an unpacked Word template
+  extract <expanded-dir> <name> <ids>  - Extract styles into a partial snippet file
+  import <subcommand> [args...]        - Import styles into a target styles.xml
+
+Run 'templx style import help' for import subcommands.
+EOF
+}
+
+case "$SUBCOMMAND" in
+    list)
+        shift
+        exec "$SCRIPT_DIR/list" "$@"
+        ;;
+    extract)
+        shift
+        exec "$SCRIPT_DIR/extract" "$@"
+        ;;
+    import)
+        shift
+        exec "$SCRIPT_DIR/import/import" "$@"
+        ;;
+    help|--help|-h|"")
+        show_help
+        ;;
+    *)
+        echo "Unknown style subcommand: $SUBCOMMAND" >&2
+        echo "Run 'templx style help' for usage information." >&2
+        exit 1
+        ;;
+esac

@@ -1,8 +1,8 @@
 #!/usr/bin/env python3
 """
-style_import_partial - import styles from a single snippet into a target styles.xml
+templx style import partial - import styles from a single snippet into a target styles.xml
 
-Usage: style_import_partial <target-styles-xml> <snippet-xml> [--dry-run] [--backup]
+Usage: templx style import partial <target-styles-xml> <snippet-xml> [--dry-run] [--backup]
 
 This replaces styles in the target with those from the snippet (matching by styleId).
 """
@@ -34,7 +34,7 @@ def extract_styles_from_file(path):
     return styles
 
 def main():
-    parser = argparse.ArgumentParser(prog='style_import_partial')
+    parser = argparse.ArgumentParser(prog='templx style import partial')
     parser.add_argument('target', help='target styles.xml to modify')
     parser.add_argument('snippet', help='snippet XML containing <w:style> elements')
     parser.add_argument('--dry-run', action='store_true')
