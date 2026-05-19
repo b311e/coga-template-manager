@@ -1,0 +1,437 @@
+#!/usr/bin/env bash
+# Manifest Generator for templx
+
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+PROJECT_ROOT="$(cd "$SCRIPT_DIR/../../../.." && pwd)"
+
+# Hyphenated command support:
+#   manifest-generate-<agency>
+#   manifest-generate-partials
+#   manifest-validate
+#   manifest-list
+
+script_base=$(basename "$0")
+case "$script_base" in
+    manifest-generate)
+        generate_manifest
+        exit $?
+        ;;
+    manifest-validate)
+        validate_manifest
+        exit $?
+        ;;
+    manifest-list)
+        list_templates
+        exit $?
+        ;;
+esac
+
+# Helper to process a single template directory and return JSON entry
+# Returns JSON for a single template
+process_single_template() {
+    local template_dir="$1"
+    local agency="$2"
+
+    [[ ! -d "$template_dir" ]] && return 1
+
+    local dir_name=$(basename "$template_dir")
+    local config_file="$template_dir/config/config.json"
+    local dir_path="${template_dir#$PROJECT_ROOT/}"
+
+    # Initialize variables with defaults
+    local key="$dir_name"
+    local collection=""
+    local status="active"
+    local ext=""
+    local type=""
+
+    # Read config.json if it exists
+    if [[ -f "$config_file" ]]; then
+        # Extract values from config using grep and sed
+        local config_key=$(grep '"key"' "$config_file" | sed 's/.*"key"[[:space:]]*:[[:space:]]*"\([^"]*\)".*/\1/')
+        local config_collection=$(grep '"collection"' "$config_file" | sed 's/.*"collection"[[:space:]]*:[[:space:]]*"\([^"]*\)".*/\1/')
+        local config_status=$(grep '"status"' "$config_file" | sed 's/.*"status"[[:space:]]*:[[:space:]]*"\([^"]*\)".*/\1/')
+        local config_ext=$(grep '"extension"' "$config_file" | sed 's/.*"extension"[[:space:]]*:[[:space:]]*"\([^"]*\)".*/\1/')
+
+        [[ -n "$config_key" ]] && key="$config_key"
+        [[ -n "$config_collection" ]] && collection="$config_collection"
+        [[ -n "$config_status" ]] && status="$config_status"
+        [[ -n "$config_ext" ]] && ext=".$config_ext"
+    fi
+
+    # Strip agency prefix from key if present
+    key="${key#$agency}"
+    key="${key#_}"  # Remove leading underscore if present
+    # Convert to snake_case if camelCase
+    key=$(echo "$key" | sed 's/\([A-Z]\)/_\L\1/g' | sed 's/^_//')
+
+    # If no collection was set from config, use the cleaned key as collection
+    [[ -z "$collection" ]] && collection="$key"
+
+    # Determine file extension and type if not in config
+    if [[ -z "$ext" ]]; then
+        for template_file in "$template_dir"/out/*.{dotm,dotx,xltx,xltm} "$template_dir"/src/*.{dotm,dotx,xltx,xltm}; do
+            [[ -f "$template_file" ]] && [[ $(basename "$template_file") != ~\$* ]] && {
+                ext=".${template_file##*.}"
+                break
+            }
+        done
+    fi
+
+    # Determine type from extension
+    case "$ext" in
+        .dotm|.dotx) type="word-doc-template" ;;
+        .xltx|.xltm) type="excel-book-template" ;;
+        *) type="" ;;
+    esac
+
+    # Scan for partials
+    local partials_json=""
+    local partials_dir="$template_dir/partials"
+    local first_partial=true
+
+    if [[ -d "$partials_dir" ]]; then
+        # Scan styles partials
+        if [[ -d "$partials_dir/styles" ]]; then
+            for partial_file in "$partials_dir/styles"/*.xml; do
+                [[ ! -f "$partial_file" ]] && continue
+                local partial_rel_path="${partial_file#$PROJECT_ROOT/}"
+                local partial_id=$(basename "$partial_file" .xml)
+                # Strip agency prefix and convert to snake_case
+                partial_id="${partial_id#$agency}"
+                partial_id="${partial_id#-}"
+                partial_id="${partial_id#_}"
+
+                if $first_partial; then
+                    partials_json="            \"$partial_id\": {\n              \"path\": \"$partial_rel_path\",\n              \"partial_type\": \"styles\"\n            }"
+                    first_partial=false
+                else
+                    partials_json="$partials_json,\n            \"$partial_id\": {\n              \"path\": \"$partial_rel_path\",\n              \"partial_type\": \"styles\"\n            }"
+                fi
+            done
+        fi
+
+        # Scan numbering partials
+        if [[ -d "$partials_dir/numbering" ]]; then
+            for partial_file in "$partials_dir/numbering"/*.xml; do
+                [[ ! -f "$partial_file" ]] && continue
+                local partial_rel_path="${partial_file#$PROJECT_ROOT/}"
+                local partial_id=$(basename "$partial_file" .xml)
+                # Strip agency prefix and convert to snake_case
+                partial_id="${partial_id#$agency}"
+                partial_id="${partial_id#-}"
+                partial_id="${partial_id#_}"
+
+                if $first_partial; then
+                    partials_json="            \"$partial_id\": {\n              \"path\": \"$partial_rel_path\",\n              \"partial_type\": \"numbering\"\n            }"
+                    first_partial=false
+                else
+                    partials_json="$partials_json,\n            \"$partial_id\": {\n              \"path\": \"$partial_rel_path\",\n              \"partial_type\": \"numbering\"\n            }"
+                fi
+            done
+        fi
+
+        # Scan macros
+        if [[ -d "$partials_dir/macros" ]]; then
+            for partial_file in "$partials_dir/macros"/*.{bas,cls}; do
+                [[ ! -f "$partial_file" ]] && continue
+                local partial_rel_path="${partial_file#$PROJECT_ROOT/}"
+                local partial_id=$(basename "$partial_file" | sed 's/\.[^.]*$//')
+                # Strip agency prefix
+                partial_id="${partial_id#$agency}"
+                partial_id="${partial_id#-}"
+                partial_id="${partial_id#_}"
+
+                if $first_partial; then
+                    partials_json="            \"$partial_id\": {\n              \"path\": \"$partial_rel_path\",\n              \"partial_type\": \"macros\"\n            }"
+                    first_partial=false
+                else
+                    partials_json="$partials_json,\n            \"$partial_id\": {\n              \"path\": \"$partial_rel_path\",\n              \"partial_type\": \"macros\"\n            }"
+                fi
+            done
+        fi
+    fi
+
+    # Build JSON entry
+    if [[ -n "$partials_json" ]]; then
+        echo "        \"$key\": {\n          \"type\": \"$type\",\n          \"extension\": \"$ext\",\n          \"directory\": \"$dir_path\",\n          \"collection\": \"$collection\",\n          \"status\": \"$status\",\n          \"partials\": {\n$partials_json\n          }\n        }"
+    else
+        echo "        \"$key\": {\n          \"type\": \"$type\",\n          \"extension\": \"$ext\",\n          \"directory\": \"$dir_path\",\n          \"collection\": \"$collection\",\n          \"status\": \"$status\"\n        }"
+    fi
+}
+
+generate_manifest() {
+    # Generate single master manifest for all builds
+    local registry_dir="$PROJECT_ROOT/.templx/registry"
+    local manifest_file="$registry_dir/manifest.json"
+    local timestamp=$(date -u +"%Y-%m-%dT%H:%M:%SZ")
+
+    echo "Generating master manifest"
+    echo "Scanning builds directory: $PROJECT_ROOT/builds"
+    echo "Manifest file: $manifest_file"
+
+    # Ensure registry directory exists
+    mkdir -p "$registry_dir"
+
+    # Start building the manifest
+    local builds_json=""
+    local first_build=true
+
+    # Iterate through all builds
+    for build_dir in "$PROJECT_ROOT/builds"/*; do
+        [[ ! -d "$build_dir" ]] && continue
+        local build_name=$(basename "$build_dir")
+
+        # Skip non-build directories
+        [[ "$build_name" == "manifests" ]] && continue
+        [[ "$build_name" == "tmp" ]] && continue
+
+        echo "  Processing build: $build_name"
+
+        # Process workspace templates
+        local workspace_json=""
+        local first_workspace=true
+        if [[ -d "$build_dir/workspace" ]]; then
+            for template_dir in "$build_dir/workspace"/*; do
+                [[ ! -d "$template_dir" ]] && continue
+                local template_entry=$(process_single_template "$template_dir" "$build_name")
+                if [[ -n "$template_entry" ]]; then
+                    if $first_workspace; then
+                        workspace_json="$template_entry"
+                        first_workspace=false
+                    else
+                        workspace_json="$workspace_json,\n$template_entry"
+                    fi
+                fi
+            done
+        fi
+
+        # Process document templates
+        local templates_json=""
+        local first_template=true
+        if [[ -d "$build_dir/templates" ]]; then
+            for template_dir in "$build_dir/templates"/*; do
+                [[ ! -d "$template_dir" ]] && continue
+                local template_entry=$(process_single_template "$template_dir" "$build_name")
+                if [[ -n "$template_entry" ]]; then
+                    if $first_template; then
+                        templates_json="$template_entry"
+                        first_template=false
+                    else
+                        templates_json="$templates_json,\n$template_entry"
+                    fi
+                fi
+            done
+        fi
+
+        # Build this build's JSON
+        local build_entry="    \"$build_name\": {\n      \"workspace\": {\n$(echo -e "$workspace_json")\n      },\n      \"templates\": {\n$(echo -e "$templates_json")\n      }\n    }"
+
+        if $first_build; then
+            builds_json="$build_entry"
+            first_build=false
+        else
+            builds_json="$builds_json,\n$build_entry"
+        fi
+    done
+
+    # Write the complete manifest
+    cat > "$manifest_file" << EOF
+{
+  "manifest_version": "1.0",
+  "generated": "$timestamp",
+  "builds": {
+$(echo -e "$builds_json")
+  }
+}
+EOF
+
+    echo "✓ Master manifest generated: $manifest_file"
+}
+
+update_template_status() {
+    local agency="$1"
+    local template="$2" 
+    local status="$3"
+    
+    if [[ -z "$agency" || -z "$template" || -z "$status" ]]; then
+        echo "Usage: manifest update-status <agency> <template> <status>"
+        echo "Status options: active, planned, deprecated, testing"
+        return 1
+    fi
+    
+    local manifest_file="$PROJECT_ROOT/.templx/registry/manifest.json"
+    
+    if [[ ! -f "$manifest_file" ]]; then
+        echo "Error: Master manifest not found: $manifest_file"
+        echo "Run: manifest generate"
+        return 1
+    fi
+    
+    # Create backup
+    cp "$manifest_file" "$manifest_file.backup"
+    
+    # Use sed to update the status for the matching template key
+    sed -i "/\"$template\"/,/status/s/\"status\": \"[^\"]*\"/\"status\": \"$status\"/" "$manifest_file"
+    
+    echo "✓ Updated $template status to '$status' in master manifest"
+    echo "✓ Backup created: $manifest_file.backup"
+}
+
+add_new_template() {
+    local agency="$1"
+    local template="$2"
+    local type="$3"
+    
+    if [[ -z "$agency" || -z "$template" || -z "$type" ]]; then
+        echo "Usage: manifest add-template <agency> <template> <type>"
+        echo "Types: excel-book-template, excel-sheet-template, word-doc-template"
+        return 1
+    fi
+    
+    echo "To add a new template '$template' to agency '$agency':"
+    echo ""
+    echo "1. Create the build folder structure:"
+    echo "   mkdir -p builds/$agency/templates/$template/{src,out,in,docs,config}"
+    echo ""
+    echo "2. Copy and fill in config shells:"
+    echo "   cp src/shells/_config_build.json builds/$agency/templates/$template/config/config_build.json"
+    echo "   cp src/shells/_config_styles.json builds/$agency/templates/$template/config/_config_styles.json"
+    echo "   # Copy the appropriate field shell from src/shells/fields/"
+    echo "   # e.g.: cp src/shells/fields/_committeeLetterhead.json builds/$agency/templates/$template/config/config_fields.json"
+    echo ""
+    echo "3. Regenerate the master manifest:"
+    echo "   manifest generate"
+}
+
+validate_manifest() {
+    echo "Validating master manifest..."
+    
+    local manifest_file="$PROJECT_ROOT/.templx/registry/manifest.json"
+    
+    if [[ -f "$manifest_file" ]]; then
+        echo "✓ Master manifest found: $manifest_file"
+        if command -v jq >/dev/null 2>&1; then
+            if jq empty "$manifest_file" 2>/dev/null; then
+                echo "✓ Master manifest is valid JSON"
+                local build_count
+                build_count=$(jq '.builds | length' "$manifest_file")
+                echo "✓ Builds tracked: $build_count"
+            else
+                echo "✗ Master manifest has invalid JSON"
+            fi
+        fi
+    else
+        echo "✗ Master manifest missing: $manifest_file"
+        echo "  Run: manifest generate"
+    fi
+}
+
+list_templates() {
+    echo "Template Registry:"
+    echo "=================="
+    
+    for agency_dir in "$PROJECT_ROOT/builds"/*; do
+        if [[ -d "$agency_dir" ]]; then
+            local agency=$(basename "$agency_dir")
+            echo ""
+            echo "Agency: $agency"
+            echo "-------"
+            
+            # List workspace templates
+            if [[ -d "$agency_dir/workspace" ]]; then
+                echo "Workspace Templates:"
+                for template_dir in "$agency_dir/workspace"/*; do
+                    if [[ -d "$template_dir" ]]; then
+                        local template_name=$(basename "$template_dir")
+                        echo "  - $template_name"
+                        
+                        # Check for source files
+                        if [[ -d "$template_dir/src" ]]; then
+                            find "$template_dir/src" -name "*.xltx" -o -name "*.dotx" -o -name "*.dotm" | while read -r file; do
+                                echo "    src: $(basename "$file")"
+                            done
+                        fi
+                        
+                        # Check for output files  
+                        if [[ -d "$template_dir/out" ]]; then
+                            find "$template_dir/out" -name "*.xltx" -o -name "*.dotx" -o -name "*.dotm" | while read -r file; do
+                                echo "    out: $(basename "$file")"
+                            done
+                        fi
+                    fi
+                done
+            fi
+            
+            # List document templates
+            if [[ -d "$agency_dir/templates" ]]; then
+                echo "Document Templates:"
+                for template_dir in "$agency_dir/templates"/*; do
+                    if [[ -d "$template_dir" ]]; then
+                        local template_name=$(basename "$template_dir")
+                        echo "  - $template_name"
+                    fi
+                done
+            fi
+        fi
+    done
+}
+
+show_help() {
+    echo "Usage: manifest <action> [options]"
+    echo ""
+    echo "Actions:"
+    echo "  generate                                   - Regenerate master manifest (.templx/registry/manifest.json)"
+    echo "  validate                                   - Validate master manifest"
+    echo "  list                                       - List all templates"
+    echo "  update status <agency> <template> <status> - Update template status in master manifest"
+    echo "  add template <agency> <template> <type>    - Guide for adding new template"
+    echo "  help, --help, -h                           - Show this help message"
+    echo ""
+    echo "Examples:"
+    echo "  manifest generate"
+    echo "  manifest validate"
+    echo "  manifest list"
+    echo "  manifest update status jbc jbcMemo active"
+    echo "  manifest add template jbc jbcReport word-doc-template"
+}
+
+case "$1" in
+    help|--help|-h)
+        show_help
+        ;;
+    manifest-*)
+        # Support hyphenated command aliases: manifest-foo-bar -> manifest foo bar
+        # Convert 'manifest-foo-bar ...' -> 'foo bar ...' and re-exec this script
+        cmd="${1#manifest-}"
+        IFS='-' read -r -a parts <<< "$cmd"
+        exec "$SCRIPT_DIR/manifest" "${parts[@]}" "${@:2}"
+        ;;
+    # New style: manifest <action> <resource> ...
+    generate)
+        generate_manifest
+        ;;
+    validate)
+        validate_manifest
+        ;;
+    list)
+        list_templates
+        ;;
+    update)
+        # manifest update status <agency> <template> <status>
+        if [[ "$2" == "status" ]]; then
+            update_template_status "$3" "$4" "$5"
+        else
+            show_help
+        fi
+        ;;
+    add)
+        # manifest add template <agency> <template> <type>
+        if [[ "$2" == "template" ]]; then
+            add_new_template "$3" "$4" "$5"
+        else
+            show_help
+        fi
+        ;;
+esac
+

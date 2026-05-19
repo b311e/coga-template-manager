@@ -84,7 +84,7 @@ manifests & naming
       - status --> build_status
       - partials --> build_partial
       - add build_space as a field
-        - core
+        - base
         - jbc
         - lcs, etc... 
 - [ ] move style-map.md from docs into a config folder

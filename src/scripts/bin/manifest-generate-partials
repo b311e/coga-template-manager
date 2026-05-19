@@ -1,5 +1,0 @@
-#!/usr/bin/env bash
-# Wrapper for manifest-generate-partials command
-# Simply exec to the manifest script which will detect the basename
-
-exec "$(dirname "${BASH_SOURCE[0]}")/../commands/manifest-utils/manifest-generate-partials" "$@"

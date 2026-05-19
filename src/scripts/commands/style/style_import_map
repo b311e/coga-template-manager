@@ -93,86 +93,41 @@ def load_style_order(path):
     # data expected to have 'style_group' mapping
     return data.get('style_group', {}) if isinstance(data, dict) else {}
 
-def load_partials_from_agency_manifests(repo_root):
-    """
-    Load partials from agency manifest files.
-    Returns a list of partial objects compatible with find_partial_snippet.
-    """
-    partials = []
-    builds_dir = os.path.join(repo_root, 'builds')
-
-    if not os.path.isdir(builds_dir):
-        return partials
-
-    # Scan all agency manifest files
-    for agency in os.listdir(builds_dir):
-        agency_dir = os.path.join(builds_dir, agency)
-        if not os.path.isdir(agency_dir):
-            continue
-
-        manifest_path = os.path.join(agency_dir, 'manifests', 'manifest.json')
-        if not os.path.exists(manifest_path):
-            continue
-
-        try:
-            with open(manifest_path, 'r', encoding='utf-8') as f:
-                manifest = json.load(f)
-
-            # Process workspace templates
-            workspace = manifest.get('workspace', {}).get('templates', {})
-            for template_name, template_data in workspace.items():
-                if 'partials' in template_data:
-                    for partial_id, partial_path in template_data['partials'].items():
-                        partials.append({
-                            'id': partial_id,
-                            'path': partial_path,
-                            'template': template_name,
-                            'agency': agency,
-                            'category': 'workspace'
-                        })
-
-            # Process regular templates
-            templates = manifest.get('templates', {}).get('templates', {})
-            for template_name, template_data in templates.items():
-                if 'partials' in template_data:
-                    for partial_id, partial_path in template_data['partials'].items():
-                        partials.append({
-                            'id': partial_id,
-                            'path': partial_path,
-                            'template': template_name,
-                            'agency': agency,
-                            'category': 'templates'
-                        })
-        except Exception as e:
-            # Skip manifests that can't be parsed
-            continue
-
-    return partials
-
 def load_partials_manifests(repo_root):
     """
-    Load partials from both agency manifests and legacy partials-manifest.json files.
-    Agency manifests take precedence.
+    Load partials from the master manifest at .templx/registry/manifest.json.
+    Returns list of dicts with id, path, template, agency, category, partial_type.
     """
-    # Load from agency manifests (new format)
-    manifests = load_partials_from_agency_manifests(repo_root)
+    partials = []
+    manifest_path = os.path.join(repo_root, '.templx', 'registry', 'manifest.json')
 
-    # Fall back to legacy partials-manifest.json if no agency manifest partials found
-    if not manifests:
-        candidates = [
-            os.path.join(repo_root, 'builds', 'manifests', 'partials-manifest.json'),
-            os.path.join(repo_root, 'core', 'manifests', 'partials-manifest.json')
-        ]
-        for p in candidates:
-            if os.path.exists(p):
-                try:
-                    with open(p, 'r', encoding='utf-8') as f:
-                        js = json.load(f)
-                        manifests.extend(js.get('snippets', []))
-                except Exception:
+    if not os.path.exists(manifest_path):
+        return partials
+
+    try:
+        with open(manifest_path, 'r', encoding='utf-8') as f:
+            manifest = json.load(f)
+    except Exception:
+        return partials
+
+    for agency, agency_data in manifest.get('builds', {}).items():
+        for category in ('workspace', 'templates'):
+            for template_name, template_data in agency_data.get(category, {}).items():
+                if not isinstance(template_data, dict):
                     continue
+                for partial_id, partial_data in template_data.get('partials', {}).items():
+                    if not isinstance(partial_data, dict):
+                        continue
+                    partials.append({
+                        'id': partial_id,
+                        'path': partial_data.get('path', ''),
+                        'template': template_name,
+                        'agency': agency,
+                        'category': category,
+                        'partial_type': partial_data.get('partial_type', ''),
+                    })
 
-    return manifests
+    return partials
 
 def find_partial_snippet(manifests, template_name, style_group, preferred_agency=None, preferred_parent=None):
     """
@@ -332,7 +287,7 @@ def main():
 
     # Set default styles-order using absolute path from repo_root
     if args.styles_order is None:
-        args.styles_order = os.path.join(repo_root, 'src', 'scripts', 'lib', 'schemas', 'style-map-schema.yml')
+        args.styles_order = os.path.join(repo_root, 'src', 'schemas', 'style-map-schema.yml')
 
     # Auto-discover mapping file: if the provided mapping doesn't exist or
     # the user relied on the default, search upward from the target for

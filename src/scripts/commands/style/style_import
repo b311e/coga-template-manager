@@ -58,26 +58,45 @@ def load_style_order(path):
     return data.get('style_group', {}) if isinstance(data, dict) else {}
 
 def load_partials_manifests(repo_root):
-    manifests = []
-    candidates = [
-        os.path.join(repo_root, 'builds', 'manifests', 'partials-manifest.json'),
-        os.path.join(repo_root, 'core', 'manifests', 'partials-manifest.json')
-    ]
-    for p in candidates:
-        if os.path.exists(p):
-            try:
-                with open(p, 'r', encoding='utf-8') as f:
-                    js = json.load(f)
-                    manifests.extend(js.get('snippets', []))
-            except Exception:
-                continue
-    return manifests
+    """
+    Load partials from the master manifest at .templx/registry/manifest.json.
+    Returns list of dicts with id, path, template, agency, category, partial_type.
+    """
+    partials = []
+    manifest_path = os.path.join(repo_root, '.templx', 'registry', 'manifest.json')
+
+    if not os.path.exists(manifest_path):
+        return partials
+
+    try:
+        with open(manifest_path, 'r', encoding='utf-8') as f:
+            manifest = json.load(f)
+    except Exception:
+        return partials
+
+    for agency, agency_data in manifest.get('builds', {}).items():
+        for category in ('workspace', 'templates'):
+            for template_name, template_data in agency_data.get(category, {}).items():
+                if not isinstance(template_data, dict):
+                    continue
+                for partial_id, partial_data in template_data.get('partials', {}).items():
+                    if not isinstance(partial_data, dict):
+                        continue
+                    partials.append({
+                        'id': partial_id,
+                        'path': partial_data.get('path', ''),
+                        'template': template_name,
+                        'agency': agency,
+                        'category': category,
+                        'partial_type': partial_data.get('partial_type', ''),
+                    })
+
+    return partials
 
 def find_partial_snippet(manifests, template_name, style_group, preferred_agency=None, preferred_parent=None):
-    # search for snippet whose id contains template_name and style_group (case-insensitive)
     tn = (template_name or '').lower()
     sg = (style_group or '').lower()
-    # First try to find a best match that includes preferred agency or parent in path
+
     def path_matches_preference(path):
         if not path:
             return False
@@ -88,37 +107,59 @@ def find_partial_snippet(manifests, template_name, style_group, preferred_agency
             return True
         return False
 
-    # strong match: contains template_name and style_group and preferred agency/parent
+    def is_style_partial(partial):
+        if partial.get('partial_type') == 'styles':
+            return True
+        path = (partial.get('path') or '').lower()
+        return '/styles/' in path
+
+    # Strong match: template, style group, preferred agency/parent
     for s in manifests:
+        if not is_style_partial(s):
+            continue
         sid = (s.get('id') or '').lower()
-        tags = [t.lower() for t in s.get('tags') or []]
-        target = (s.get('target') or '').lower()
+        template = (s.get('template') or '').lower()
         path = s.get('path') or ''
-        if tn and tn in sid and sg in sid and path_matches_preference(path) and ('styles' in tags or 'word:styles' in target or target == 'word:styles'):
+        if template and template == tn and sg in sid and path_matches_preference(path):
+            return path
+        if tn and tn in sid and sg in sid and path_matches_preference(path):
             return path
 
-    # next prefer preferred agency/parent with looser id matching
+    # Match template and style group (any agency)
     for s in manifests:
+        if not is_style_partial(s):
+            continue
         sid = (s.get('id') or '').lower()
-        tags = [t.lower() for t in s.get('tags') or []]
-        target = (s.get('target') or '').lower()
+        template = (s.get('template') or '').lower()
+        if template and template == tn and sg in sid:
+            return s.get('path')
+        if tn and tn in sid and sg in sid:
+            return s.get('path')
+
+    # Match just template with preferred agency/parent
+    for s in manifests:
+        if not is_style_partial(s):
+            continue
+        sid = (s.get('id') or '').lower()
+        template = (s.get('template') or '').lower()
         path = s.get('path') or ''
-        if path_matches_preference(path) and ('styles' in tags or 'word:styles' in target or target == 'word:styles'):
-            if tn == '' or tn in sid:
+        if path_matches_preference(path):
+            if template and template == tn:
+                return path
+            if tn and tn in sid:
                 return path
 
-    # fallback: original behavior
+    # Fallback: match just template name (any agency)
     for s in manifests:
+        if not is_style_partial(s):
+            continue
         sid = (s.get('id') or '').lower()
-        tags = [t.lower() for t in s.get('tags') or []]
-        target = (s.get('target') or '').lower()
-        if tn and tn in sid and sg in sid and ('styles' in tags or 'word:styles' in target or target == 'word:styles'):
+        template = (s.get('template') or '').lower()
+        if template and template == tn:
             return s.get('path')
-    # fallback: try matching just template_name
-    for s in manifests:
-        sid = (s.get('id') or '').lower()
-        if tn and tn in sid and ('styles' in [t.lower() for t in s.get('tags') or []] or 'word:styles' in (s.get('target') or '').lower()):
+        if tn and tn in sid:
             return s.get('path')
+
     return None
 
 NS = {'w': 'http://schemas.openxmlformats.org/wordprocessingml/2006/main'}
@@ -142,7 +183,7 @@ def main():
     parser = argparse.ArgumentParser(prog='style_import')
     parser.add_argument('target', help='target styles.xml to modify')
     parser.add_argument('--mapping', default='docs/style-mapping.yml')
-    parser.add_argument('--styles-order', default=os.path.join('src','scripts','lib','schemas','style-map-schema.yml'))
+    parser.add_argument('--styles-order', default=os.path.join('src','schemas','style-map-schema.yml'))
     parser.add_argument('--dry-run', action='store_true')
     parser.add_argument('--replace', action='store_true', help='Replace existing styles with same id')
     parser.add_argument('--backup', action='store_true', dest='backup', help='Create a .bak backup before writing (disabled by default)')

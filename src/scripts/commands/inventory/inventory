@@ -87,7 +87,7 @@ add_agency_section() {
     echo "" >> "$output_file"
     echo "| Template Name   | Status   |" >> "$output_file"
     echo "|-----------------|----------|" >> "$output_file"
-    local manifest_file="$PROJECT_ROOT/builds/$agency_code/manifests/manifest.json"
+    local manifest_file="$PROJECT_ROOT/.templx/registry/manifest.json"
     if [[ "$active" == "true" && -f "$manifest_file" ]]; then
         extract_templates "$output_file" "$manifest_file" "$agency_code"
     else
@@ -108,15 +108,15 @@ extract_templates() {
                 echo "| $template_name | $status |" >> "$output_file"
                 found_templates=true
             fi
-        done < <(jq -r '.workspace.templates // {} | to_entries[] | "\(.key)|\(.value.status)"' "$manifest_file" 2>/dev/null)
+        done < <(jq -r --arg agency "$agency_code" '.builds[$agency].workspace // {} | to_entries[] | "\(.key)|\(.value.status)"' "$manifest_file" 2>/dev/null)
         while IFS='|' read -r template_name status; do
             if [[ -n "$template_name" ]]; then
                 echo "| $template_name | $status |" >> "$output_file"
                 found_templates=true
             fi
-        done < <(jq -r '.templates.templates // {} | to_entries[] | "\(.key)|\(.value.status)"' "$manifest_file" 2>/dev/null)
+        done < <(jq -r --arg agency "$agency_code" '.builds[$agency].templates // {} | to_entries[] | "\(.key)|\(.value.status)"' "$manifest_file" 2>/dev/null)
     else
-        extract_templates_basic "$output_file" "$manifest_file"
+        echo "| jq required for inventory | - |" >> "$output_file"
         found_templates=true
     fi
     if [[ "$found_templates" == "false" ]]; then

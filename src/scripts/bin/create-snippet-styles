@@ -1,5 +1,0 @@
-#!/usr/bin/env bash
-# Wrapper for create-snippet-styles script
-
-SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-"$SCRIPT_DIR/../create/create-snippet-styles" "$@"

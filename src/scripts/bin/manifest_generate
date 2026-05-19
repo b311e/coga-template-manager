@@ -1,3 +1,4 @@
 #!/usr/bin/env bash
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-exec "$SCRIPT_DIR/../internal/command_dispatch/command_dispatch.sh" "$@"
+exec "$SCRIPT_DIR/../commands/manifest_utils/manifest" generate "$@"
+
