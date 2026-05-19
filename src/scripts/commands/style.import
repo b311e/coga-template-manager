@@ -20,15 +20,15 @@ EOF
 case "$SUBCOMMAND" in
     map)
         shift
-        exec python "$SCRIPT_DIR/map" "$@"
+        exec python "$SCRIPT_DIR/style.import.map" "$@"
         ;;
     partial)
         shift
-        exec python "$SCRIPT_DIR/partial" "$@"
+        exec python "$SCRIPT_DIR/style.import.partial" "$@"
         ;;
     doc)
         shift
-        exec dotnet run --project "$SCRIPT_DIR/doc" -- "$@"
+        exec dotnet run --project "$SCRIPT_DIR/style.import.doc" -- "$@"
         ;;
     help|--help|-h|"")
         show_help

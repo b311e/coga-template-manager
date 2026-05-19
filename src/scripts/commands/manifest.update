@@ -18,7 +18,7 @@ EOF
 case "$SUBCOMMAND" in
     status)
         shift
-        exec "$SCRIPT_DIR/status" "$@"
+        exec "$SCRIPT_DIR/manifest.update.status" "$@"
         ;;
     help|--help|-h|"")
         show_help

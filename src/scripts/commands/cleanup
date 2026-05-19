@@ -21,11 +21,11 @@ EOF
 case "$SUBCOMMAND" in
     wordml)
         shift
-        exec "$SCRIPT_DIR/wordml" "$@"
+        exec "$SCRIPT_DIR/cleanup.wordml" "$@"
         ;;
     linkchar|noproof|tracking)
         shift
-        exec python "$SCRIPT_DIR/$SUBCOMMAND" "$@"
+        exec python "$SCRIPT_DIR/cleanup.$SUBCOMMAND" "$@"
         ;;
     help|--help|-h|"")
         show_help

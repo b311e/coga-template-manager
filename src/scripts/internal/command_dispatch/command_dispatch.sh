@@ -48,7 +48,7 @@ COMMAND="${1:-}"
 case "$COMMAND" in
     pack|unpack|create|validate|xpathsel|style|inventory|cleanup|manifest)
         shift
-        exec "$COMMANDS_DIR/$COMMAND/$COMMAND" "$@"
+        exec "$COMMANDS_DIR/$COMMAND" "$@"
         ;;
     help|--help|-h|"")
         show_help
