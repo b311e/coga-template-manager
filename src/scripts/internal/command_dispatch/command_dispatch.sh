@@ -1,60 +1,61 @@
 #!/usr/bin/env bash
-# templx Command Dispatcher
+# templx command dispatcher
+
+set -euo pipefail
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+COMMANDS_DIR="$SCRIPT_DIR/../../commands"
 
-case "$1" in
-    pack)
-        exec "$SCRIPT_DIR/../../commands/pack/pack" "$@"
+show_help() {
+    cat <<EOF
+templx — OpenXML template toolchain
+
+Usage: templx <command> [subcommand] [args...]
+
+Commands:
+  pack <expanded-dir> [out]                  - Package OpenXML document from expanded directory
+  unpack <file>                              - Unpack OpenXML document to expanded directory
+  create <file-type> [name]                  - Create new template/document from scratch
+  validate <file>                            - Validate OpenXML document against schema
+  xpathsel <file> <xpath>                    - Run an XPath query against an XML file
+
+  style list <expanded-dir>                  - List styles in an unpacked Word template
+  style extract <expanded-dir> <name> <ids>  - Extract styles into a partial snippet
+  style import map <target> [--mapping <f>]  - Map-driven import from partials manifest
+  style import partial <target> <snippet>    - Import all styles from a single snippet
+  style import doc <target> <source-doc>     - Copy styles from one Word document to another
+
+  inventory generate                         - Generate docs/template-inventory.md
+  cleanup wordml <expanded-dir>              - Full automated cleanup of WordprocessingML
+  cleanup linkchar <styles.xml>              - Remove linked character styles
+  cleanup noproof <xml-file>                 - Remove noProof elements
+  cleanup tracking <xml-file>                - Remove RSID/tracking attributes
+
+  manifest generate                          - Regenerate master manifest
+  manifest validate                          - Validate master manifest
+  manifest list                              - List all builds and templates
+  manifest update status <a> <t> <status>    - Update template status
+  manifest add template <a> <t> <type>       - Print instructions for new template
+
+  help                                       - Show this help message
+
+Run '<command> help' (or '<command> <subcommand> help') for command-specific options.
+EOF
+}
+
+COMMAND="${1:-}"
+
+case "$COMMAND" in
+    pack|unpack|create|validate|xpathsel|style|inventory|cleanup|manifest)
+        shift
+        exec "$COMMANDS_DIR/$COMMAND/$COMMAND" "$@"
         ;;
-    unpack)
-        exec "$SCRIPT_DIR/../../commands/unpack/unpack" "$@"
-        ;;
-    create)
-        exec "$SCRIPT_DIR/../../commands/create/create" "$@"
-        ;;
-    validate)
-        exec "$SCRIPT_DIR/../../commands/validate/validate" "$@"
-        ;;
-    style)
-        exec "$SCRIPT_DIR/../../commands/style/style" "$@"
-        ;;
-    inventory)
-        exec "$SCRIPT_DIR/../../commands/inventory/inventory" "$@"
-        ;;
-    cleanup)
-        exec "$SCRIPT_DIR/../../commands/cleanup/cleanup" "$@"
-        ;;
-    manifest)
-        exec "$SCRIPT_DIR/../../commands/manifest/manifest" "$@"
-        ;;
-    help|--help|-h)
-        echo "templx"
-        echo ""
-        echo "Usage: templx <command> [subcommand] [args...]"
-        echo ""
-        echo "Commands:"
-        echo "  pack <target-file>                         - Package OpenXML document from expanded directory"
-        echo "  unpack <target-file>                       - Unpack OpenXML document to expanded directory"
-        echo "  create <file-type> [name]                  - Create new template/document"
-        echo "  validate <target-file>                     - Validate OpenXML document against schema"
-        echo "  style list <template>                      - Extract and list styles from Word template"
-        echo "  style import <target> <source>             - Import styles from source to target Word doc"
-        echo "  style import snippet <target> <snippet>    - Import styles from XML snippet"
-        echo "  inventory                                  - Generate template inventory"
-        echo "  cleanup wordml <expanded-dir>              - Automated cleanup of WordprocessingML files"
-        echo "  manifest generate                          - Regenerate master manifest (.templx/registry/manifest.json)"
-        echo "  manifest validate                          - Validate master manifest"
-        echo "  manifest list                              - List all templates"
-        echo "  manifest update status <a> <t> <status>    - Update template status in master manifest"
-        echo "  manifest add template <a> <t> <type>       - Guide for adding new template"
-        echo "  help                                       - Show this help message"
-        echo ""
-        echo "Run '<command> help' for command-specific options"
+    help|--help|-h|"")
+        show_help
         ;;
     *)
-        echo "Unknown command: $1"
-        echo "Run 'templx help' for usage information"
+        echo "Unknown command: $COMMAND" >&2
+        echo "Run 'templx help' for usage information." >&2
         exit 1
         ;;
 esac

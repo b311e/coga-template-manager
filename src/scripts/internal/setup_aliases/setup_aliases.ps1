@@ -1,39 +1,49 @@
-# Setup script to add project commands to PowerShell session
-# Run this with: . .\src\scripts\setup_aliases\setup_aliases.ps1
-# Or add to your $PROFILE for permanent aliases
+# Setup script to expose templx commands in the current PowerShell session.
+# Run with:    . .\src\scripts\internal\setup_aliases\setup_aliases.ps1
+# Or add to your $PROFILE to load every session.
+#
+# The bash scripts under src/scripts/bin/ are the canonical implementations.
+# This file defines thin PowerShell wrappers that invoke them through Git Bash.
 
 $ScriptDir = Split-Path -Parent $MyInvocation.MyCommand.Path
-$ScriptsPath = Split-Path -Parent $ScriptDir
-$ProjectRoot = Resolve-Path (Join-Path $ScriptsPath "..\..")
+$BinPath = Resolve-Path (Join-Path $ScriptDir "..\..\bin") | Select-Object -ExpandProperty Path
 
-Write-Host "Setting up templx PowerShell aliases..."
-Write-Host ""
+$GitBash = "C:\Program Files\Git\bin\bash.exe"
+if (-not (Test-Path $GitBash)) {
+    Write-Host "Error: Git Bash not found at: $GitBash"
+    Write-Host "This script requires Git for Windows. Install it from https://gitforwindows.org/"
+    return
+}
 
-# Define all command functions
-function global:create { & "$ScriptsPath\create\create.ps1" @args }
-function global:unpack { & "$ScriptsPath\unpack\unpack.ps1" @args }
-function global:pack { & "$ScriptsPath\pack\pack.ps1" @args }
-function global:replace-styles { & "$ScriptsPath\replace_styles\replace-styles.ps1" @args }
-function global:replace-styles-from-snippet { & "$ScriptsPath\replace_styles\replace-styles-from-snippet.ps1" @args }
-function global:cleanup { & "$ScriptsPath\commands\cleanup\cleanup.ps1" @args }
-function global:list-styles { & "$ScriptsPath\list-styles.ps1" @args }
-function global:manifest { & "$ScriptsPath\commands\manifest\manifest.ps1" @args }
-function global:validate { & "$ScriptsPath\validate\validate.ps1" @args }
+# Convert a Windows path to a Git Bash path (C:\foo -> /c/foo)
+function script:ConvertTo-BashPath($path) {
+    $p = $path -replace '\\', '/'
+    if ($p -match '^([A-Za-z]):/(.*)') {
+        return "/$($matches[1].ToLower())/$($matches[2])"
+    }
+    return $p
+}
 
-Write-Host "PowerShell aliases configured for current session!"
+function script:Invoke-TemplxCommand($name) {
+    $bashPath = ConvertTo-BashPath (Join-Path $BinPath $name)
+    & $GitBash $bashPath @args
+}
+
+function global:templx    { Invoke-TemplxCommand 'templx' @args }
+function global:pack      { Invoke-TemplxCommand 'pack' @args }
+function global:unpack    { Invoke-TemplxCommand 'unpack' @args }
+function global:create    { Invoke-TemplxCommand 'create' @args }
+function global:validate  { Invoke-TemplxCommand 'validate' @args }
+function global:xpathsel  { Invoke-TemplxCommand 'xpathsel' @args }
+function global:style     { Invoke-TemplxCommand 'style' @args }
+function global:inventory { Invoke-TemplxCommand 'inventory' @args }
+function global:cleanup   { Invoke-TemplxCommand 'cleanup' @args }
+function global:manifest  { Invoke-TemplxCommand 'manifest' @args }
+
+Write-Host "templx PowerShell aliases configured for current session."
 Write-Host ""
-Write-Host "Available commands:"
-Write-Host "  create - Create new OpenXML templates/documents"
-Write-Host "  unpack - Unpack OpenXML file to expanded folder"
-Write-Host "  pack - Pack directory to OpenXML file"
-Write-Host "  replace-styles - Copy styles from source to target Word doc"
-Write-Host "  replace-styles-from-snippet - Replace styles from XML snippet file"
-Write-Host "  cleanup wordml - Automated cleanup of WordprocessingML files"
-Write-Host "  list-styles - Generate style list for template"
-Write-Host "  manifest - Manage template manifests and registry"
-Write-Host "  validate - Validate OOXML files and generate reports"
+Write-Host "Top-level commands available:"
+Write-Host "  templx pack unpack create validate xpathsel"
+Write-Host "  style inventory cleanup manifest"
 Write-Host ""
-Write-Host "Examples:"
-Write-Host "  create xl-template Book"
-Write-Host "  validate core\templates\normal\src\Normal.dotm"
-Write-Host "  list-styles builds\jbc\workspace\jbcNormal"
+Write-Host "Run 'templx help' for the full command list."

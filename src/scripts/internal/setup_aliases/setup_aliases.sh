@@ -1,34 +1,22 @@
 #!/usr/bin/env bash
-# Setup script to add project scripts to PATH
+# Setup script to add the templx bin/ to PATH for the current shell session
 # Run this with: source setup_aliases.sh
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-SCRIPTS_PATH="$SCRIPT_DIR/../.."
-BIN_PATH="$SCRIPTS_PATH/bin"
+BIN_PATH="$(cd "$SCRIPT_DIR/../../bin" && pwd)"
 
-# Add to PATH if not already there (prefer bin/ so top-level names map to wrapper scripts)
 if [[ ":$PATH:" != *":$BIN_PATH:"* ]]; then
     export PATH="$BIN_PATH:$PATH"
     echo "Added $BIN_PATH to PATH"
     echo ""
-    echo "You can now use these commands directly:"
-    echo "  create <type> [output file name]    - Create new OpenXML templates/documents"
-    echo "  unpack <input file name>            - Unpack OpenXML file to 'expanded' folder"
-    echo "  pack <sourceDir> <outputFile>       - Pack directory to OpenXML file"
-    echo "  style import <target> <source>      - Import styles from source to target Word doc"
-    echo "  style import snippet <target> <snippet-file> [id] - Import styles from XML snippet"
-    echo "  cleanup wordml <expanded-dir>       - Automated cleanup of WordprocessingML files"
-    echo "  style list <templatePath>           - Generate style list for template"
-    echo "  manifest <command> [options]        - Manage template manifests and registry"
-    echo "  validate <file-path>                - Validate OOXML files and generate reports"
+    echo "Top-level commands now available:"
+    echo "  templx <command> [subcommand] [args...]  - Main dispatcher (preferred)"
     echo ""
-    echo "Examples:" 
-    echo "  create excel-book-template Book"
-    echo "  manifest generate      # regenerate master manifest"
-    echo "  manifest validate      # validate master manifest"
-    echo "  create word-doc-template jbcLetterhead"
-    echo "  unpack templates/jbc/jbcBook/src/Book.xltx"
-    echo "  style list builds/jbc/workspace/jbcNormal"
+    echo "Or call top-level commands directly:"
+    echo "  pack, unpack, create, validate, xpathsel"
+    echo "  style, inventory, cleanup, manifest"
+    echo ""
+    echo "Run 'templx help' for the full command list."
 else
     echo "Scripts bin directory already in PATH"
 fi
