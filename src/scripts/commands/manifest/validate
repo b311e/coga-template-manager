@@ -1,0 +1,40 @@
+#!/usr/bin/env bash
+# templx manifest validate - validate the master manifest
+
+set -euo pipefail
+
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+PROJECT_ROOT="$(cd "$SCRIPT_DIR/../../../.." && pwd)"
+
+if [[ "${1:-}" == "help" || "${1:-}" == "--help" || "${1:-}" == "-h" ]]; then
+    cat <<EOF
+Usage: templx manifest validate
+
+Validates the master manifest at .templx/registry/manifest.json:
+checks the file exists and is valid JSON, reports the build count.
+EOF
+    exit 0
+fi
+
+manifest_file="$PROJECT_ROOT/.templx/registry/manifest.json"
+
+echo "Validating master manifest..."
+
+if [[ ! -f "$manifest_file" ]]; then
+    echo "✗ Master manifest missing: $manifest_file"
+    echo "  Run: templx manifest generate"
+    exit 1
+fi
+
+echo "✓ Master manifest found: $manifest_file"
+
+if command -v jq >/dev/null 2>&1; then
+    if jq empty "$manifest_file" 2>/dev/null; then
+        echo "✓ Master manifest is valid JSON"
+        build_count=$(jq '.builds | length' "$manifest_file")
+        echo "✓ Builds tracked: $build_count"
+    else
+        echo "✗ Master manifest has invalid JSON"
+        exit 1
+    fi
+fi

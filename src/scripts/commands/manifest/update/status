@@ -1,0 +1,40 @@
+#!/usr/bin/env bash
+# templx manifest update status - update a template's status in the master manifest
+
+set -euo pipefail
+
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+PROJECT_ROOT="$(cd "$SCRIPT_DIR/../../../../.." && pwd)"
+
+if [[ "${1:-}" == "help" || "${1:-}" == "--help" || "${1:-}" == "-h" ]] || [[ $# -lt 3 ]]; then
+    cat <<EOF
+Usage: templx manifest update status <agency> <template> <status>
+
+Update a template's status in the master manifest.
+
+Arguments:
+  agency    - Agency code (e.g., jbc, base)
+  template  - Template name (e.g., jbcMemo)
+  status    - One of: active, planned, deprecated, testing
+EOF
+    [[ $# -lt 3 ]] && exit 1
+    exit 0
+fi
+
+agency="$1"
+template="$2"
+status="$3"
+
+manifest_file="$PROJECT_ROOT/.templx/registry/manifest.json"
+
+if [[ ! -f "$manifest_file" ]]; then
+    echo "Error: Master manifest not found: $manifest_file" >&2
+    echo "Run: templx manifest generate" >&2
+    exit 1
+fi
+
+cp "$manifest_file" "$manifest_file.backup"
+sed -i "/\"$template\"/,/status/s/\"status\": \"[^\"]*\"/\"status\": \"$status\"/" "$manifest_file"
+
+echo "✓ Updated $template status to '$status' in master manifest"
+echo "✓ Backup created: $manifest_file.backup"
