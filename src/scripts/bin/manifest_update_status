@@ -1,2 +1,0 @@
-#!/usr/bin/env bash
-exec "$(dirname "${BASH_SOURCE[0]}")/../commands/manifest_utils/manifest" update status "$@"

@@ -1,4 +1,0 @@
-#!/usr/bin/env bash
-SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-PROJECT_DIR="$SCRIPT_DIR/../commands/style/style_import_doc"
-exec dotnet run --project "$PROJECT_DIR" -- "$@"
