@@ -1,4 +1,6 @@
 {
+  "config": "fields",
+  "template": "committeeLetterhead",
   "committee_name": "Executive Committee of the Legislative Council",
   "committee_address_line_1": "State Capitol Building, Room 011",
   "committee_address_line_2": "Denver, Colorado 80203-1784",

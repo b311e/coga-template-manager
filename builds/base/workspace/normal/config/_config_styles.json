@@ -1,0 +1,68 @@
+{
+  "config_type": "styles",
+  "agency": "core",
+  "template": "coreNormal",
+  "description": "Used to configure the source of style partials imported into a template.",
+  "style_groups": {
+    "doc_default": {
+      "agency": "core",
+      "template": "coreNormal"
+    },
+    "default": {
+      "agency": "core",
+      "template": "coreNormal"
+    },
+    "heading": {
+      "agency": "core",
+      "template": "coreNormal"
+    },
+    "body": {
+      "agency": "core",
+      "template": "coreNormal"
+    },
+    "front_matter": {
+      "agency": "core",
+      "template": "coreNormal"
+    },
+    "list": {
+      "agency": "core",
+      "template": "coreNormal"
+    },
+    "callout": {
+      "agency": "core",
+      "template": "coreNormal"
+    },
+    "caption": {
+      "agency": "core",
+      "template": "coreNormal"
+    },
+    "toc": {
+      "agency": "core",
+      "template": "coreNormal"
+    },
+    "index": {
+      "agency": "core",
+      "template": "coreNormal"
+    },
+    "header": {
+      "agency": "core",
+      "template": "coreNormal"
+    },
+    "footer": {
+      "agency": "core",
+      "template": "coreNormal"
+    },
+    "other": {
+      "agency": "core",
+      "template": "coreNormal"
+    },
+    "character": {
+      "agency": "core",
+      "template": "coreNormal"
+    },
+    "table": {
+      "agency": "core",
+      "template": "coreNormal"
+    }
+  }
+}
