@@ -1,0 +1,281 @@
+#!/usr/bin/env bash
+# templx cleanup wordml - full automated cleanup of WordprocessingML files
+
+set -euo pipefail
+
+if [[ "${1:-}" == "help" || "${1:-}" == "--help" || "${1:-}" == "-h" ]] || [ $# -eq 0 ]; then
+    cat <<EOF
+Usage: templx cleanup wordml <expanded-template-dir>
+
+Performs automated cleanup on unpacked WordprocessingML files:
+  - Removes unnecessary parts (comments, endnotes, glossary, customXml, etc.)
+  - Removes RSID attributes and blocks
+  - Removes noProof, iCs, szCs, bCs elements
+  - Removes bidirectional language settings
+  - Cleans up empty rPr and pPr blocks
+  - Removes linked character styles
+  - Reformats XML with xmllint
+
+Example:
+  templx cleanup wordml /path/to/template_expanded
+EOF
+    [ $# -eq 0 ] && exit 1
+    exit 0
+fi
+
+TEMPLATE_DIR="$1"
+
+if [ ! -d "$TEMPLATE_DIR" ]; then
+    echo "Error: Directory not found: $TEMPLATE_DIR" >&2
+    exit 1
+fi
+
+if [ ! -d "$TEMPLATE_DIR/word" ]; then
+    echo "Error: Not a valid unpacked template: missing 'word' directory" >&2
+    exit 1
+fi
+
+STYLES_FILE="$TEMPLATE_DIR/word/styles.xml"
+SETTINGS_FILE="$TEMPLATE_DIR/word/settings.xml"
+
+if [ ! -f "$STYLES_FILE" ]; then
+    echo "Error: styles.xml not found at: $STYLES_FILE" >&2
+    exit 1
+fi
+
+echo "WordprocessingML Automated Cleanup"
+echo "Target: $TEMPLATE_DIR"
+echo ""
+
+# Helper: remove a word/<name>.xml part and its rels + content-types entries
+remove_word_part() {
+    local name="$1"
+    local part_file="$TEMPLATE_DIR/word/$name.xml"
+    [ ! -f "$part_file" ] && return 0
+
+    echo "Removing $name.xml..."
+    rm -f "$part_file"
+
+    local rels_file="$TEMPLATE_DIR/word/_rels/document.xml.rels"
+    if [ -f "$rels_file" ]; then
+        perl -i -0pe "s/<Relationship[^>]*Type=\"[^\"]*\/$name\"[^>]*\/?>\\s*\\n//g" "$rels_file"
+    fi
+
+    local content_types="$TEMPLATE_DIR/[Content_Types].xml"
+    if [ -f "$content_types" ]; then
+        perl -i -0pe "s/<Override[^>]*PartName=\"\\/word\\/$name\\.xml\"[^>]*\\/?>\\s*\\n//g" "$content_types"
+    fi
+
+    echo "✓ $name.xml removed"
+}
+
+for part in comments commentsExtended commentsExtensible commentsIds endnotes people; do
+    remove_word_part "$part"
+done
+
+# Remove glossary folder
+if [ -d "$TEMPLATE_DIR/word/glossary" ]; then
+    echo "Removing glossary folder..."
+    rm -rf "$TEMPLATE_DIR/word/glossary"
+    RELS_FILE="$TEMPLATE_DIR/word/_rels/document.xml.rels"
+    if [ -f "$RELS_FILE" ]; then
+        perl -i -0pe 's/<Relationship[^>]*Type="[^"]*\/glossaryDocument"[^>]*\/?>\s*\n//g' "$RELS_FILE"
+    fi
+    CONTENT_TYPES="$TEMPLATE_DIR/[Content_Types].xml"
+    if [ -f "$CONTENT_TYPES" ]; then
+        perl -i -0pe 's/<Override[^>]*PartName="\/word\/glossary\/[^"]*"[^>]*\/?>\s*\n//g' "$CONTENT_TYPES"
+    fi
+    echo "✓ glossary folder removed"
+fi
+
+# Remove customXml folder
+if [ -d "$TEMPLATE_DIR/customXml" ]; then
+    echo "Removing customXml folder..."
+    rm -rf "$TEMPLATE_DIR/customXml"
+    RELS_FILE="$TEMPLATE_DIR/_rels/.rels"
+    if [ -f "$RELS_FILE" ]; then
+        perl -i -0pe 's/<Relationship[^>]*Target="customXml\/[^"]*"[^>]*\/?>\s*\n//g' "$RELS_FILE"
+    fi
+    CONTENT_TYPES="$TEMPLATE_DIR/[Content_Types].xml"
+    if [ -f "$CONTENT_TYPES" ]; then
+        perl -i -0pe 's/<Override[^>]*PartName="\/customXml\/[^"]*"[^>]*\/?>\s*\n//g' "$CONTENT_TYPES"
+    fi
+    echo "✓ customXml folder removed"
+fi
+
+echo ""
+
+echo "Removing RSID attributes..."
+find "$TEMPLATE_DIR/word" -name "*.xml" -type f -exec perl -i -pe 's/\s+w:rsid[A-Z][a-zA-Z]*="[0-9A-F]+"//g' {} \;
+find "$TEMPLATE_DIR/word" -name "*.xml" -type f -exec perl -i -pe 's/\s+rsid[A-Z][a-zA-Z]*="[0-9A-F]+"//g' {} \;
+find "$TEMPLATE_DIR/word" -name "*.xml" -type f -exec perl -i -0pe 's/\s*\n\s*\n\s*>/>/gs' {} \;
+find "$TEMPLATE_DIR/word" -name "*.xml" -type f -exec perl -i -0pe 's/\s*\n>/>/gs' {} \;
+echo "✓ RSID attributes removed from all files"
+
+echo "Removing individual RSID elements..."
+perl -i -pe 's/^\s*<w:rsid\s+w:val="[0-9A-F]+"\s*\/>\s*\n//g' "$STYLES_FILE"
+echo "✓ Individual RSID elements removed"
+
+if [ -f "$SETTINGS_FILE" ]; then
+    echo "Removing RSID block from settings.xml..."
+    perl -i -0pe 's/<w:rsids>.*?<\/w:rsids>\s*\n//gs' "$SETTINGS_FILE"
+    echo "✓ RSID block removed from settings.xml"
+fi
+
+echo "Removing noProof elements..."
+find "$TEMPLATE_DIR/word" -name "*.xml" -type f -exec perl -i -pe 's/^\s*<w:noProof\s*\/>\s*\n//g' {} \;
+echo "✓ noProof elements removed from all files"
+
+echo "Removing iCs elements..."
+find "$TEMPLATE_DIR/word" -name "*.xml" -type f -exec perl -i -pe 's/^\s*<w:iCs\s*\/>\s*\n//g' {} \;
+echo "✓ iCs elements removed from all files"
+
+echo "Removing bCs elements..."
+find "$TEMPLATE_DIR/word" -name "*.xml" -type f -exec perl -i -pe 's/^\s*<w:bCs\s*\/>\s*\n//g' {} \;
+echo "✓ bCs elements removed from all files"
+
+echo "Removing szCs elements..."
+find "$TEMPLATE_DIR/word" -name "*.xml" -type f -exec perl -i -pe 's/^\s*<w:szCs\s+w:val="[^"]+"\s*\/>\s*\n//g' {} \;
+echo "✓ szCs elements removed from all files"
+
+echo "Removing bidi language attributes..."
+find "$TEMPLATE_DIR/word" -name "*.xml" -type f -exec perl -i -pe 's/\s+w:bidi="[^"]+"//g' {} \;
+echo "✓ Bidi language attributes removed from all files"
+
+echo "Cleaning up empty rPr blocks..."
+find "$TEMPLATE_DIR/word" -name "*.xml" -type f -exec perl -i -0pe 's/<w:rPr>\s*<\/w:rPr>\s*\n//gs' {} \;
+find "$TEMPLATE_DIR/word" -name "*.xml" -type f -exec perl -i -0pe 's/<w:rPr\/>\s*\n//g' {} \;
+echo "✓ Empty rPr blocks removed from all files"
+
+echo "Cleaning up empty pPr blocks..."
+find "$TEMPLATE_DIR/word" -name "*.xml" -type f -exec perl -i -0pe 's/<w:pPr>\s*<\/w:pPr>\s*\n//gs' {} \;
+find "$TEMPLATE_DIR/word" -name "*.xml" -type f -exec perl -i -0pe 's/<w:pPr\/>\s*\n//g' {} \;
+echo "✓ Empty pPr blocks removed from all files"
+
+if [ -f "$SETTINGS_FILE" ]; then
+    echo "Removing revision tracking settings..."
+    perl -i -pe 's/^\s*<w:trackRevisions\s*\/>\s*\n//g' "$SETTINGS_FILE"
+    perl -i -pe 's/^\s*<w:trackFormatting\s*\/>\s*\n//g' "$SETTINGS_FILE"
+    echo "✓ Revision tracking settings removed"
+fi
+
+DOCUMENT_FILE="$TEMPLATE_DIR/word/document.xml"
+if [ -f "$DOCUMENT_FILE" ]; then
+    echo "Removing comment references from document.xml..."
+    perl -i -0pe 's/<w:commentRangeStart[^>]*\/?>//gs' "$DOCUMENT_FILE"
+    perl -i -0pe 's/<w:commentRangeEnd[^>]*\/?>//gs' "$DOCUMENT_FILE"
+    perl -i -0pe 's/<w:commentReference[^>]*\/?>//gs' "$DOCUMENT_FILE"
+    echo "✓ Comment references removed from document.xml"
+
+    echo "Validating document.xml syntax..."
+    if xmllint --noout "$DOCUMENT_FILE" 2>/dev/null; then
+        echo "✓ document.xml is valid"
+    else
+        echo "  Warning: document.xml has XML syntax errors"
+    fi
+fi
+
+if [ -f "$SETTINGS_FILE" ]; then
+    echo "Removing endnote settings..."
+    perl -i -0pe 's/<w:endnotePr>.*?<\/w:endnotePr>//gs' "$SETTINGS_FILE"
+    perl -i -0pe 's/<w:footnotePr>.*?<\/w:footnotePr>//gs' "$SETTINGS_FILE"
+    echo "✓ Endnote and footnote settings removed"
+fi
+
+if [ -f "$STYLES_FILE" ]; then
+    echo "Removing styles with 'delete' in name..."
+    perl -i -0pe 's/<w:style\s+[^>]*w:styleId="[^"]*[Dd][Ee][Ll][Ee][Tt][Ee][^"]*"[^>]*>.*?<\/w:style>\s*\n//gs' "$STYLES_FILE"
+    perl -i -0pe 's/<w:style\s+[^>]*>\s*<w:name\s+w:val="[^"]*[Dd][Ee][Ll][Ee][Tt][Ee][^"]*"[^>]*\/>.*?<\/w:style>\s*\n//gs' "$STYLES_FILE"
+    echo "✓ Styles with 'delete' removed"
+fi
+
+NUMBERING_FILE="$TEMPLATE_DIR/word/numbering.xml"
+if [ -f "$NUMBERING_FILE" ]; then
+    echo "Removing numbering with 'delete' in name..."
+    perl -i -0pe 's/<w:abstractNum\s+[^>]*>(?:(?!<\/w:abstractNum>).)*<w:name\s+w:val="[^"]*[Dd][Ee][Ll][Ee][Tt][Ee][^"]*"[^>]*\/>.*?<\/w:abstractNum>\s*\n//gs' "$NUMBERING_FILE"
+    perl -i -0pe 's/<w:abstractNum\s+[^>]*>(?:(?!<\/w:abstractNum>).)*<w:styleLink\s+w:val="[^"]*[Dd][Ee][Ll][Ee][Tt][Ee][^"]*"[^>]*\/>.*?<\/w:abstractNum>\s*\n//gs' "$NUMBERING_FILE"
+    echo "✓ Numbering and abstractNum with 'delete' removed"
+fi
+
+echo "Removing linked heading character styles..."
+perl -i -pe 's/^\s*<w:link\s+w:val="Heading[0-9]Char"\s*\/>\s*\n//g' "$STYLES_FILE"
+perl -i -0pe 's/<w:style\s+w:type="character"[^>]*w:styleId="Heading[0-9]Char"[^>]*>.*?<\/w:style>\s*\n//gs' "$STYLES_FILE"
+echo "✓ Linked heading character styles removed"
+
+echo ""
+
+DOC_RELS="$TEMPLATE_DIR/word/_rels/document.xml.rels"
+if [ -f "$DOC_RELS" ]; then
+    echo "Cleaning up document.xml.rels..."
+    for name in comments commentsExtended commentsExtensible commentsIds endnotes people; do
+        perl -i -0pe "s/<Relationship[^>]*Target=\"$name\\.xml\"[^>]*\\/?>//gs" "$DOC_RELS"
+    done
+    perl -i -0pe 's/<Relationship[^>]*Target="glossary\/document\.xml"[^>]*\/?>//gs' "$DOC_RELS"
+    perl -i -0pe 's/<Relationship[^>]*Target="\.\.\/customXml\/[^"]*"[^>]*\/?>//gs' "$DOC_RELS"
+    echo "✓ document.xml.rels cleaned"
+fi
+
+CONTENT_TYPES="$TEMPLATE_DIR/[Content_Types].xml"
+if [ -f "$CONTENT_TYPES" ]; then
+    echo "Cleaning up [Content_Types].xml..."
+    for name in comments commentsExtended commentsExtensible commentsIds endnotes people; do
+        perl -i -0pe "s/<Override[^>]*PartName=\"\\/word\\/$name\\.xml\"[^>]*\\/?>//gs" "$CONTENT_TYPES"
+    done
+    perl -i -0pe 's/<Override[^>]*PartName="\/word\/glossary\/[^"]*"[^>]*\/?>//gs' "$CONTENT_TYPES"
+    perl -i -0pe 's/<Override[^>]*PartName="\/customXml\/[^"]*"[^>]*\/?>//gs' "$CONTENT_TYPES"
+    echo "✓ [Content_Types].xml cleaned"
+fi
+
+echo ""
+
+echo "Validating and fixing XML syntax..."
+XML_FIXED=0
+
+if [ -f "$CONTENT_TYPES" ]; then
+    if xmllint --format "$CONTENT_TYPES" > "$CONTENT_TYPES.tmp" 2>/dev/null; then
+        mv "$CONTENT_TYPES.tmp" "$CONTENT_TYPES"
+        XML_FIXED=$((XML_FIXED + 1))
+    else
+        rm -f "$CONTENT_TYPES.tmp"
+        echo "  Warning: Could not validate/fix [Content_Types].xml"
+    fi
+fi
+
+for rels_file in $(find "$TEMPLATE_DIR" -name "*.rels" -type f); do
+    if xmllint --format "$rels_file" > "$rels_file.tmp" 2>/dev/null; then
+        mv "$rels_file.tmp" "$rels_file"
+        XML_FIXED=$((XML_FIXED + 1))
+    else
+        rm -f "$rels_file.tmp"
+        echo "  Warning: Could not validate/fix $rels_file"
+    fi
+done
+
+for xml_file in $(find "$TEMPLATE_DIR/word" -name "*.xml" -type f); do
+    if [[ "$xml_file" == *"/document.xml" ]]; then
+        if xmllint --noout "$xml_file" 2>/dev/null; then
+            XML_FIXED=$((XML_FIXED + 1))
+        else
+            echo "  Warning: document.xml has XML syntax errors"
+        fi
+    else
+        if xmllint --format "$xml_file" > "$xml_file.tmp" 2>/dev/null; then
+            mv "$xml_file.tmp" "$xml_file"
+            XML_FIXED=$((XML_FIXED + 1))
+        else
+            rm -f "$xml_file.tmp"
+            echo "  Warning: Could not validate/fix $xml_file"
+        fi
+    fi
+done
+echo "✓ XML syntax validated and fixed ($XML_FIXED files processed)"
+
+echo ""
+echo "✓ Cleanup completed"
+echo ""
+echo "Next steps:"
+echo "  1. Review the cleaned files manually"
+echo "  2. Complete manual validation checklist items"
+echo "  3. Pack and test the template:"
+echo "     templx pack $TEMPLATE_DIR"
+echo ""
