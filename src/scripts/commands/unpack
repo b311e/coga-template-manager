@@ -45,6 +45,41 @@ SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 # so we need to go up three levels to reach the repo root.
 PROJECT_ROOT="$(cd "$SCRIPT_DIR/../../.." && pwd)"
 
-# Run the dotnet command from the project file. Use "--" to ensure any
-# subsequent arguments are forwarded to the application (not to dotnet).
-dotnet run --project "$PROJECT_ROOT/src/OpenXmlApp/OpenXmlApp.csproj" -- unpack "$@"
+TEMPLATE_FILE="$(normalize_path "$1")"
+# Make absolute if relative
+if [[ "$TEMPLATE_FILE" != /* ]]; then
+    TEMPLATE_FILE="$PWD/$TEMPLATE_FILE"
+fi
+
+if [ ! -f "$TEMPLATE_FILE" ]; then
+    echo "Error: File not found: $TEMPLATE_FILE" >&2
+    exit 1
+fi
+
+if [ $# -ge 2 ]; then
+    OUTPUT_DIR="$(normalize_path "$2")"
+    if [[ "$OUTPUT_DIR" != /* ]]; then
+        OUTPUT_DIR="$PWD/$OUTPUT_DIR"
+    fi
+    # Explicit output: remove existing folder if present
+    if [ -d "$OUTPUT_DIR" ]; then
+        echo "Output folder already exists, removing: $OUTPUT_DIR"
+        rm -rf "$OUTPUT_DIR"
+    fi
+else
+    BASE_NAME="$(basename "$TEMPLATE_FILE")"
+    BASE_NAME="${BASE_NAME%.*}"
+    PARENT_DIR="$(dirname "$TEMPLATE_FILE")"
+    OUTPUT_DIR="$PARENT_DIR/${BASE_NAME}_expanded"
+
+    # If folder already exists, append timestamp to avoid removing user data
+    if [ -d "$OUTPUT_DIR" ]; then
+        TS="$(date -u +%Y%m%d%H%M%S)"
+        OUTPUT_DIR="$PARENT_DIR/${BASE_NAME}_expanded_${TS}"
+    fi
+    echo "No output specified — unpacking to: $OUTPUT_DIR"
+fi
+
+mkdir -p "$OUTPUT_DIR"
+unzip -q "$TEMPLATE_FILE" -d "$OUTPUT_DIR"
+echo "Unpacked to: $OUTPUT_DIR"

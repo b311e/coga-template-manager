@@ -133,5 +133,16 @@ else
     echo "Auto-generating: $OUTPUT_FILE"
 fi
 
-# Run the dotnet pack
-dotnet run --project "$PROJECT_ROOT/src/OpenXmlApp/OpenXmlApp.csproj" -- pack "$SOURCE_TO_PACK" "$OUTPUT_FILE"
+# Ensure output path is absolute before cd'ing into the source directory
+if [[ "$OUTPUT_FILE" != /* ]]; then
+    OUTPUT_FILE="$PWD/$OUTPUT_FILE"
+fi
+
+# Remove existing output file if present
+if [ -f "$OUTPUT_FILE" ]; then
+    rm "$OUTPUT_FILE"
+fi
+
+# Pack by zipping the contents of the source directory
+(cd "$SOURCE_TO_PACK" && zip -r "$OUTPUT_FILE" .)
+echo "Packed: $OUTPUT_FILE"

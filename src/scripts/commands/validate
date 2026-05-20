@@ -51,7 +51,7 @@ fi
 # Get the script directory to find the project
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 PROJECT_ROOT="$(cd "$SCRIPT_DIR/../../.." && pwd)"
-OPENXML_APP="$PROJECT_ROOT/src/OpenXmlApp/bin/Debug/net8.0/OpenXmlApp.exe"
+VALIDATOR="$PROJECT_ROOT/src/scripts/internal/validate_ooxml.py"
 
 # Normalize the file path
 FILE_PATH="$(normalize_path "$1")"
@@ -62,13 +62,11 @@ if [ ! -f "$FILE_PATH" ]; then
     exit 1
 fi
 
-# Check if OpenXmlApp is built
-if [ ! -f "$OPENXML_APP" ]; then
-    echo "OpenXmlApp not found. Building..."
-    cd "$PROJECT_ROOT/src/OpenXmlApp"
-    dotnet build --configuration Debug
-    cd - > /dev/null
+# Require Python 3 and lxml
+if ! command -v python3 &>/dev/null; then
+    echo "Error: python3 is required but not found in PATH" >&2
+    exit 1
 fi
 
 # Run validation
-"$OPENXML_APP" validate "$FILE_PATH"
+python3 "$VALIDATOR" "$FILE_PATH"
