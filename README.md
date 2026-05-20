@@ -349,9 +349,9 @@ manifest add template jbc jbcReport word-doc-template
 
 ### Deployment Scripts
 
-- `dist/scripts/workspaceInstallPreProd.bat` - Deploy to PreProd environment
-- `dist/scripts/workspaceDeploy.bat` - Deploy from PreProd to Production
-- `dist/jbc/workspace/jbcWorkspaceInstall.bat` - JBC end-user installation script
+- `dist/scripts/workspace-install-pre-prod.bat` - Deploy to PreProd environment
+- `dist/scripts/workspace-deploy.bat` - Deploy from PreProd to Production
+- `dist/scripts/jbc-workspace-install.bat` - JBC end-user installation script
 
 ## Template Inventory System
 
