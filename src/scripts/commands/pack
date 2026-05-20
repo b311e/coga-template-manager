@@ -29,9 +29,9 @@ if [[ "$1" == "help" || "$1" == "--help" || "$1" == "-h" ]] 2>/dev/null; then
     echo "  output file       - (Optional) Output file path. Auto-generated if omitted."
     echo ""
     echo "Examples:"
-    echo "  pack builds/jbc/workspace/jbcNormal/in"
+    echo "  pack builds/jbc/foundation/jbcNormal/in"
     echo "  pack builds/jbc/templates/jbcMemo/in"
-    echo "  pack builds/jbc/workspace/jbcSheet/in builds/jbc/workspace/jbcSheet/out/CustomSheet.xltx"
+    echo "  pack builds/jbc/foundation/jbcSheet/in builds/jbc/foundation/jbcSheet/out/CustomSheet.xltx"
     exit 0
 fi
 

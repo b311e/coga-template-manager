@@ -16,8 +16,8 @@ if [[ "${1:-}" == "help" || "${1:-}" == "--help" || "${1:-}" == "-h" ]]; then
     echo "  Style list saved to docs/style-list-{templateName}.txt in template directory"
     echo ""
     echo "Examples:"
-    echo "  templx style list builds/jbc/workspace/jbcNormal/in"
-    echo "  templx style list C:/code/templx/builds/jbc/workspace/jbcNormal/in"
+    echo "  templx style list builds/jbc/foundation/jbcNormal/in"
+    echo "  templx style list C:/code/templx/builds/jbc/foundation/jbcNormal/in"
     exit 0
 fi
 
