@@ -27,8 +27,8 @@ if [[ "$1" == "help" || "$1" == "--help" || "$1" == "-h" ]] 2>/dev/null; then
     echo "  file path  - Path to .dotx, .dotm, .xltx, .xltm, etc. file"
     echo ""
     echo "Examples:"
-    echo "  unpack builds/jbc/foundation/jbcNormal/src/Normal.dotm"
-    echo "  unpack builds/jbc/templates/jbcMemo/src/Memo.dotx"
+    echo "  unpack builds/jbc/foundation/normal/src/Normal.dotm"
+    echo "  unpack builds/jbc/templates/memo/src/Memo.dotx"
     exit 0
 fi
 

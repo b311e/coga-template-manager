@@ -37,8 +37,8 @@ if [[ "$1" == "help" || "$1" == "--help" || "$1" == "-h" ]] 2>/dev/null; then
     echo "  Validation report saved to <file-directory>/reports/<filename>-report.txt"
     echo ""
     echo "Examples:"
-    echo "  validate builds/jbc/foundation/jbcNormal/out/jbcNormal.dotm"
-    echo "  validate builds/jbc/templates/jbcMemo/out/jbcMemo.dotx"
+    echo "  validate builds/jbc/foundation/normal/out/normal.dotm"
+    echo "  validate builds/jbc/templates/memo/out/memo.dotx"
     exit 0
 fi
 
