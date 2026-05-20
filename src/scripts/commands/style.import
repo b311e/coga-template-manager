@@ -28,7 +28,7 @@ case "$SUBCOMMAND" in
         ;;
     doc)
         shift
-        exec dotnet run --project "$SCRIPT_DIR/style.import.doc" -- "$@"
+        exec python3 "$SCRIPT_DIR/../internal/style_import_doc.py" "$@"
         ;;
     help|--help|-h|"")
         show_help
