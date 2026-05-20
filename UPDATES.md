@@ -74,7 +74,7 @@ Resolution becomes: for each style, for each property, walk the layers and take 
     ```
 
 - [ ] Create script that creates `.templx/index.json. This will replace the manifest.json and agencies.json and the scripts that creates those. The command should be: 
-builds reindex
+builds reindex. OR: SQL database? Pros? Cons?
 - [] index.json should be saved under .templx/builds
 - [] each template gets its own folder here: .templx/builds/<agency>/templates/<template-name>
 
