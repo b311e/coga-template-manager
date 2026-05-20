@@ -2,24 +2,132 @@
 
 ## 2026-05-19 - Refactor To Do's and Notes
 
-- [X] Make src/scripts flat (no sub-folder per script), commands and subcommands naming convention separated by `.`.
+- [] Make src/scripts and commands use `-`, not `.`
 - [X] Replace pack/unpack/test-clean with bash (no runtime needed, not replying on Open XML App)
 - [X] Replace style import with Python (not replying on Open XML App)
 - [X] Move outside schemas to resources/schemas
 - [X] Move `C:\code\templx\resources\specs\ECMA 376 Office Open XML` schema files to resources/schemas/ooxml
 - [X] Download referenced dublin core schemas and put them under resources/schemas as well.
-- [X] Update validate command: Python + lxml — can validate against XSD schemas. 
-- [ ] Update template folder names to use snake_case (e.g., builds/base/templates/committeeLetterhead --> builds/base/templates/committee_letterhead)
+- [X] Update validate command: Python + lxml — can validate against XSD schemas.
+- [] rename "base" folders to "default"
+- [] rename "workspace" folders to "foundation"
+- [] Update template folder names to use kabob-case (e.g., builds/base/templates/committeeLetterhead --> builds/base/templates/committee-letterhead)
+- [] get rid of .templx/registry and everything within it.
+- [] 
+- [] create `.templx/config` (just create shell for now)
+- [] create `.templx/logs` (just create shell for now, with note that it isnt working yet)
+- [] create `.templx/builds/index.json`
+- [] create `.templx/builds/<agency>/templates/<template-name>`
+- [] update the `build/templates/<agency>/<template-name>/config` folder to be `/data`.
+
+- [] update builds folder structure
+
+```
+builds/
+├── default/                      ← theme layer (was "base")
+│   ├── foundation/               ← shared-material location (was "workspace")
+│   │   ├── normal.dotx           ← Word foundation file (keep — mirrors Office)
+│   │   ├── assets
+│   │   ├── components/
+│   │   │   ├── content/
+│   │   │   ├── macros/
+│   │   │   ├── numbering/
+│   │   │   └── styling/
+│   │   └── data/                 ← system-default field values (the fallback layer)
+│   └── templates/
+└── <agency>/                     ← theme layer - Agency (column 1)
+    ├── foundation/
+    │   └── data/
+    │       └── contact.json    
+    └── templates/
+        └── report/               ← Category (column 2) 
+            ├── _base/            ← within-variant parent (the one true "base")
+            ├── annual/           ← Template (Column 3): "Annual Report"
+            │   └── data/
+            │       └── fields.json
+            └── quarterly/        ← Template (Column 3): "Quarterly Report"
+```
+
+- [ ] Update logic for style import. rename it to style sync
+
+Every layer has its own components/styles/styles.json and components/styles/styles.xml. Listing a style in a layer's styles.json means "this layer overrides that style." Not listing it means "this layer is silent on it — keep looking up." Everything unstated is inherited. For any given style, the sync walks from most-specific layer to least and stops at the first styles.json that mentions it, then pulls from the styles.xml in the same directory.
+
+```
+template/styles.json
+  → category _base/styles.json
+    → agency foundation/styles.json
+      → default _base/styles.json
+        → default foundation/styles.json   (the floor — must define everything)
+```
+
+Property-level (merge): annual's Heading2 lists only { "color": "red" }, and the resolver merges that over the inherited Heading2 (which itself may be agency-over-default). Change one property, write one property. Default's later spacing change does flow through, because annual only overrode color. 
+
+Resolution becomes: for each style, for each property, walk the layers and take the first that sets it. `style sync` then shows provenance per property when it matters:
+
+```
+Heading2:
+  color    → annual          (template override)
+  font     → acme/foundation  (agency override)
+  size     → default          
+  spacing  → default          
+```
+
+- [ ] Create script that creates `.templx/index.json. This will replace the manifest.json and agencies.json and the scripts that creates those. The command should be: 
+builds reindex
+
+```json
+{
+  "version": 1,
+  "builds": [
+    {
+      "id": "",
+      "created_at": "2026-05-19T14:32:01Z",
+      "status": "success",
+      "agency": "",
+      "category": "",
+      "template": "",
+      "output": "builds/2026-05-19-abc123/output.dotx"
+    }
+  ]
+}
+```
+
+- [] create the following commands:
+    - builds list -> reads index.json, prints the table
+    - builds show <id> -> reads that build's metadata.json for full detail
+    - builds open <id> -> opens the output file
+
+- [] create very clear list of categories (Memo, Report, Agenda, Letterhead, Committee Letterhead, Analysis)
+
+- [ ] Document style sync instructions: 
+
+1. If the template has a custom style, put the StyleId into the styles.json. 
+2. Run style sync
 
 
-What I want:
+
+
+### Notes and New Requirements
+
+We're building a design system, of sorts.
+
+Tokens
+- colors, fonts, styles (the smallest reusable values)
+- Tokens should be named semantically, not literally. Not blue-700 but color-primary. Not garamond-14 but text-body. Semantic names are what let the agency layer override color-heading-primary to their blue without every deliverable knowing the literal value.
+
+Components: 
+- content blocks, macros, styles, numbering, reusable components
+
+library vs instances:
+- base/agency workspaces are the library (definitions available to be used)
+- deliverables are instances (specific compositions that consume the library)
+
+
+CLI Requirements
 - Follow CLI Best Practices
 - git-like CLI design
     - Stateful working directory: Commands operate on context inferred from where you are
-- create .templx/config
-- create .templx/logs
-- create .templx/builds/index.json
-- create .templx/builds/<agency>/templates/<template_name>
+
 
 
 ## 2025-01-27
