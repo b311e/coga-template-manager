@@ -1,8 +1,30 @@
 # Updates and Future Tasks
 
+## 2026-05-19 - Refactor To Do's and Notes
+
+- [X] Make src/scripts flat (no sub-folder per script), commands and subcommands naming convention separated by `.`.
+- [X] Replace pack/unpack/test-clean with bash (no runtime needed, not replying on Open XML App)
+- [X] Replace style import with Python (not replying on Open XML App)
+- [X] Move outside schemas to resources/schemas
+- [X] Move `C:\code\templx\resources\specs\ECMA 376 Office Open XML` schema files to resources/schemas/ooxml
+- [X] Download referenced dublin core schemas and put them under resources/schemas as well.
+- [X] Update validate command: Python + lxml — can validate against XSD schemas. 
+- [ ] Update template folder names to use snake_case (e.g., builds/base/templates/committeeLetterhead --> builds/base/templates/committee_letterhead)
+
+
+What I want:
+- Follow CLI Best Practices
+- git-like CLI design
+    - Stateful working directory: Commands operate on context inferred from where you are
+- create .templx/config
+- create .templx/logs
+- create .templx/builds/index.json
+- create .templx/builds/<agency>/templates/<template_name>
+
+
 ## 2025-01-27
 
-"### partials updates
+### partials updates
 - [x] change "snippet id" to "partial name" in partial.xml
 - [x] change file naming for partials from kabob-case to snake_case
 - [x] partial name should not include "styles" anymore. Need to remove this from the pattern entirely. The naming convention for partial_name is: [agency][Template][StyleGroup] 
@@ -37,6 +59,8 @@
 
 ### To do:
 
+
+---
 - [ ] fix src/shells/config_fields.json to have template-specific fields for committee_templates (to reference collection field in committee templates?)
 - [ ] create all other style partials shell files
 - [ ] update other fields in schemas to flow with new system

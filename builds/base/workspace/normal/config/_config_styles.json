@@ -1,68 +1,68 @@
 {
   "config_type": "styles",
-  "agency": "core",
-  "template": "coreNormal",
+  "agency": "base",
+  "template": "baseNormal",
   "description": "Used to configure the source of style partials imported into a template.",
   "style_groups": {
     "doc_default": {
-      "agency": "core",
-      "template": "coreNormal"
+      "agency": "base",
+      "template": "baseNormal"
     },
     "default": {
-      "agency": "core",
-      "template": "coreNormal"
+      "agency": "base",
+      "template": "baseNormal"
     },
     "heading": {
-      "agency": "core",
-      "template": "coreNormal"
+      "agency": "base",
+      "template": "baseNormal"
     },
     "body": {
-      "agency": "core",
-      "template": "coreNormal"
+      "agency": "base",
+      "template": "baseNormal"
     },
     "front_matter": {
-      "agency": "core",
-      "template": "coreNormal"
+      "agency": "base",
+      "template": "baseLetterhead"
     },
     "list": {
-      "agency": "core",
-      "template": "coreNormal"
+      "agency": "base",
+      "template": "baseNormal"
     },
     "callout": {
-      "agency": "core",
-      "template": "coreNormal"
+      "agency": "base",
+      "template": "baseNormal"
     },
     "caption": {
-      "agency": "core",
-      "template": "coreNormal"
+      "agency": "base",
+      "template": "baseNormal"
     },
     "toc": {
-      "agency": "core",
-      "template": "coreNormal"
+      "agency": "base",
+      "template": "baseNormal"
     },
     "index": {
-      "agency": "core",
-      "template": "coreNormal"
+      "agency": "base",
+      "template": "baseNormal"
     },
     "header": {
-      "agency": "core",
-      "template": "coreNormal"
+      "agency": "base",
+      "template": "baseNormal"
     },
     "footer": {
-      "agency": "core",
-      "template": "coreNormal"
+      "agency": "base",
+      "template": "baseNormal"
     },
     "other": {
-      "agency": "core",
-      "template": "coreNormal"
+      "agency": "base",
+      "template": "baseNormal"
     },
     "character": {
-      "agency": "core",
-      "template": "coreNormal"
+      "agency": "base",
+      "template": "baseNormal"
     },
     "table": {
-      "agency": "core",
-      "template": "coreNormal"
+      "agency": "base",
+      "template": "baseNormal"
     }
   }
 }

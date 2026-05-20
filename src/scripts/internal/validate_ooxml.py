@@ -19,9 +19,11 @@ except ImportError:
 # Paths relative to this script: src/scripts/internal/ -> project root is 3 levels up
 _SCRIPT_DIR = Path(__file__).resolve().parent
 PROJECT_ROOT = _SCRIPT_DIR.parent.parent.parent
-SCHEMA_DIR = PROJECT_ROOT / "resources" / "schemas" / "ooxml"
-TRANSITIONAL = SCHEMA_DIR / "transitional"
-OPC_DIR = SCHEMA_DIR / "opc"
+SCHEMA_DIR    = PROJECT_ROOT / "resources" / "schemas"
+OOXML_DIR     = SCHEMA_DIR / "ooxml"
+TRANSITIONAL  = OOXML_DIR / "transitional"
+OPC_DIR       = OOXML_DIR / "opc"
+DC_DIR        = SCHEMA_DIR / "dublin-core"
 
 # Parts to validate and which schema applies to each.
 # Patterns are matched in order; first match wins.
@@ -37,32 +39,27 @@ PART_SCHEMA_MAP = [
 # Maps external schema URLs to local filenames within the same directory.
 # Used by LocalSchemaResolver to avoid network access at validation time.
 _EXTERNAL_SCHEMA_MAP = {
-    "http://dublincore.org/schemas/xmls/qdc/2003/04/02/dc.xsd":       "dc.xsd",
-    "http://dublincore.org/schemas/xmls/qdc/2003/04/02/dcterms.xsd":  "dcterms.xsd",
-    "http://dublincore.org/schemas/xmls/qdc/2003/04/02/dcmitype.xsd": "dcmitype.xsd",
-    "http://www.w3.org/2001/03/xml.xsd":                              "xml.xsd",
+    "http://dublincore.org/schemas/xmls/qdc/2003/04/02/dc.xsd":       DC_DIR / "dc.xsd",
+    "http://dublincore.org/schemas/xmls/qdc/2003/04/02/dcterms.xsd":  DC_DIR / "dcterms.xsd",
+    "http://dublincore.org/schemas/xmls/qdc/2003/04/02/dcmitype.xsd": DC_DIR / "dcmitype.xsd",
+    "http://www.w3.org/2001/03/xml.xsd":                              DC_DIR / "xml.xsd",
 }
 
 
 class LocalSchemaResolver(etree.Resolver):
-    """Redirects external schema URL imports to local files in the same directory."""
-
-    def __init__(self, schema_dir: Path):
-        self.schema_dir = schema_dir
+    """Redirects external schema URL imports to local files."""
 
     def resolve(self, url, id, context):
-        filename = _EXTERNAL_SCHEMA_MAP.get(url)
-        if filename:
-            local = self.schema_dir / filename
-            if local.exists():
-                return self.resolve_filename(str(local), context)
+        local = _EXTERNAL_SCHEMA_MAP.get(url)
+        if local and local.exists():
+            return self.resolve_filename(str(local), context)
         return None
 
 
 def load_schema(xsd_path: Path) -> "etree.XMLSchema | None":
     """Load an XSD schema, routing any external imports to local copies."""
     parser = etree.XMLParser()
-    parser.resolvers.add(LocalSchemaResolver(xsd_path.parent))
+    parser.resolvers.add(LocalSchemaResolver())
     try:
         schema_doc = etree.parse(str(xsd_path), parser)
         return etree.XMLSchema(schema_doc)
