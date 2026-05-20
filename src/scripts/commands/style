@@ -22,15 +22,15 @@ EOF
 case "$SUBCOMMAND" in
     list)
         shift
-        exec "$SCRIPT_DIR/style.list" "$@"
+        exec "$SCRIPT_DIR/style-list" "$@"
         ;;
     extract)
         shift
-        exec "$SCRIPT_DIR/style.extract" "$@"
+        exec "$SCRIPT_DIR/style-extract" "$@"
         ;;
     import)
         shift
-        exec "$SCRIPT_DIR/style.import" "$@"
+        exec "$SCRIPT_DIR/style-import" "$@"
         ;;
     help|--help|-h|"")
         show_help

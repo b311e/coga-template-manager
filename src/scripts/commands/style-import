@@ -20,11 +20,11 @@ EOF
 case "$SUBCOMMAND" in
     map)
         shift
-        exec python "$SCRIPT_DIR/style.import.map" "$@"
+        exec python "$SCRIPT_DIR/style-import-map" "$@"
         ;;
     partial)
         shift
-        exec python "$SCRIPT_DIR/style.import.partial" "$@"
+        exec python "$SCRIPT_DIR/style-import-partial" "$@"
         ;;
     doc)
         shift

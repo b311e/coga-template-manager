@@ -18,7 +18,7 @@ EOF
 case "$SUBCOMMAND" in
     template)
         shift
-        exec "$SCRIPT_DIR/manifest.add.template" "$@"
+        exec "$SCRIPT_DIR/manifest-add-template" "$@"
         ;;
     help|--help|-h|"")
         show_help

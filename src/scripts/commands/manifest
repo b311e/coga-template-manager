@@ -27,23 +27,23 @@ EOF
 case "$SUBCOMMAND" in
     generate)
         shift
-        exec "$SCRIPT_DIR/manifest.generate" "$@"
+        exec "$SCRIPT_DIR/manifest-generate" "$@"
         ;;
     validate)
         shift
-        exec "$SCRIPT_DIR/manifest.validate" "$@"
+        exec "$SCRIPT_DIR/manifest-validate" "$@"
         ;;
     list)
         shift
-        exec "$SCRIPT_DIR/manifest.list" "$@"
+        exec "$SCRIPT_DIR/manifest-list" "$@"
         ;;
     update)
         shift
-        exec "$SCRIPT_DIR/manifest.update" "$@"
+        exec "$SCRIPT_DIR/manifest-update" "$@"
         ;;
     add)
         shift
-        exec "$SCRIPT_DIR/manifest.add" "$@"
+        exec "$SCRIPT_DIR/manifest-add" "$@"
         ;;
     help|--help|-h|"")
         show_help

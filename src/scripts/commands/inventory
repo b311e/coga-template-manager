@@ -18,7 +18,7 @@ EOF
 case "$SUBCOMMAND" in
     generate)
         shift
-        exec "$SCRIPT_DIR/inventory.generate" "$@"
+        exec "$SCRIPT_DIR/inventory-generate" "$@"
         ;;
     help|--help|-h|"")
         show_help
