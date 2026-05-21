@@ -106,23 +106,36 @@ TEMPLATE_NAME_CLEAN="${TEMPLATE_NAME%_expanded}"
 TEMPLATE_PARENT_DIR="$(dirname "$ABS_TEMPLATE_DIR")"
 OUT_DIR="$TEMPLATE_PARENT_DIR"
 
-# Determine extension: prefer xl (.xltx/.xltm) if xl/ exists, otherwise word (.dotx/.dotm)
-EXT="dotx"
-if [ -d "$SOURCE_TO_PACK/xl" ]; then
-    # excel
-    if [ -f "$SOURCE_TO_PACK/xl/vbaProject.bin" ] || [ -f "$SOURCE_TO_PACK/vbaProject.bin" ]; then
-        EXT="xltm"
-    else
-        EXT="xltx"
-    fi
-elif [ -d "$SOURCE_TO_PACK/word" ]; then
-    # word
-    if [ -f "$SOURCE_TO_PACK/word/vbaProject.bin" ] || [ -f "$SOURCE_TO_PACK/vbaProject.bin" ]; then
-        EXT="dotm"
-    else
-        EXT="dotx"
-    fi
+# Determine extension from [Content_Types].xml
+CONTENT_TYPES_FILE="$SOURCE_TO_PACK/[Content_Types].xml"
+if [ ! -f "$CONTENT_TYPES_FILE" ]; then
+    echo "Error: [Content_Types].xml not found in $SOURCE_TO_PACK" >&2
+    exit 1
 fi
+
+CONTENT_TYPE=$(grep -oP '(?<=ContentType=")[^"]+\.main(?:\+xml)?' "$CONTENT_TYPES_FILE" | head -1)
+
+case "$CONTENT_TYPE" in
+    # Word
+    *wordprocessingml.document.main*)    EXT="docx" ;;
+    *wordprocessingml.template.main*)    EXT="dotx" ;;
+    *ms-word.document.macroEnabled*)     EXT="docm" ;;
+    *ms-word.template.macroEnabled*)     EXT="dotm" ;;
+    # Excel
+    *spreadsheetml.sheet.main*)          EXT="xlsx" ;;
+    *spreadsheetml.template.main*)       EXT="xltx" ;;
+    *ms-excel.sheet.macroEnabled.main*)  EXT="xlsm" ;;
+    *ms-excel.template.macroEnabled*)    EXT="xltm" ;;
+    # PowerPoint
+    *presentationml.presentation.main*)  EXT="pptx" ;;
+    *presentationml.template.main*)      EXT="potx" ;;
+    *presentationml.slideshow.main*)     EXT="ppsx" ;;
+    *ms-powerpoint.presentation.macro*)  EXT="pptm" ;;
+    *)
+        echo "Error: Unrecognized content type: '$CONTENT_TYPE'" >&2
+        exit 1
+        ;;
+esac
 
 # Use provided output file if specified
 if [ $# -gt 1 ]; then

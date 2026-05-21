@@ -1,4 +1,0 @@
-#!/usr/bin/env bash
-# Wrapper for validate script
-SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-source "$SCRIPT_DIR/../commands/validate/validate" "$@"

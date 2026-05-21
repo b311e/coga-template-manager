@@ -55,7 +55,7 @@ Every layer has its own components/styles/styles.json and components/styles/styl
 
     ```
     template/styles.json
-    → category _base/styles.json
+    → layout _base/styles.json
         → agency foundation/styles.json
         → default _base/styles.json
             → default foundation/styles.json   (the floor — must define everything)
