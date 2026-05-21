@@ -21,6 +21,8 @@
 - [X] move all deployment (dist) scripts to templx/dist folder
 - [X] update builds folder structure (rename existing files)
 
+
+THIS IS OUTDATED NOW (5/20)
     ```
     builds/
     ├── default/                      ← theme layer (was "base")
