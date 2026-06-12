@@ -1,0 +1,40 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(powershell -NoProfile -Command '$PSVersionTable.PSVersion.ToString\\(\\)')",
+      "Bash(cmd //c \"C:\\\\\\\\code\\\\\\\\templx\\\\\\\\templx-lite\\\\\\\\unpack.bat\" \"C:\\\\\\\\code\\\\\\\\templx\\\\\\\\tmp\\\\\\\\templx-lite-test\\\\\\\\coreNormal.dotm\")",
+      "Bash(cmd //c \"C:\\\\\\\\code\\\\\\\\templx\\\\\\\\templx-lite\\\\\\\\pack.bat\" \"C:\\\\\\\\code\\\\\\\\templx\\\\\\\\tmp\\\\\\\\templx-lite-test\\\\\\\\coreNormal.dotm_unpacked\")",
+      "Bash(ls tmp/templx-lite-test 2>/dev/null; echo \"---\"; lsof +D /c/code/templx/tmp/templx-lite-test 2>/dev/null | head; echo \"try removing children individually\"; rm -rf /c/code/templx/tmp/templx-lite-test/a /c/code/templx/tmp/templx-lite-test/b 2>&1; rm -f /c/code/templx/tmp/templx-lite-test/*.dotm /c/code/templx/tmp/templx-lite-test/*.xltx 2>&1; ls -la /c/code/templx/tmp/templx-lite-test 2>&1)",
+      "Bash(cmd //c \"C:\\\\\\\\code\\\\\\\\templx\\\\\\\\templx-lite\\\\\\\\unpack.bat\" \"C:\\\\\\\\code\\\\\\\\templx\\\\\\\\tmp\\\\\\\\lt\\\\\\\\coreNormal.dotm\")",
+      "Bash(cmd //c \"C:\\\\\\\\code\\\\\\\\templx\\\\\\\\templx-lite\\\\\\\\pack.bat\" \"C:\\\\\\\\code\\\\\\\\templx\\\\\\\\tmp\\\\\\\\lt\\\\\\\\coreNormal.dotm_unpacked\")",
+      "Bash(unzip -Z1 coreNormal.dotm)",
+      "Bash(grep '\\\\\\\\')",
+      "Bash(unzip -t coreNormal.dotm)",
+      "Bash(cmd //c \"C:\\\\\\\\code\\\\\\\\templx\\\\\\\\templx-lite\\\\\\\\unpack.bat\" \"C:\\\\\\\\code\\\\\\\\templx\\\\\\\\tmp\\\\\\\\lt2\\\\\\\\coreNormal.dotm\")",
+      "Bash(cmd //c \"C:\\\\\\\\code\\\\\\\\templx\\\\\\\\templx-lite\\\\\\\\pack.bat\" \"C:\\\\\\\\code\\\\\\\\templx\\\\\\\\tmp\\\\\\\\lt2\\\\\\\\coreNormal.dotm_unpacked\")",
+      "Bash(unzip -t /c/code/templx/tmp/lt2/coreNormal_packed.dotm)",
+      "Bash(unzip -Z1 /c/code/templx/tmp/lt2/coreNormal_packed.dotm)",
+      "Bash(pwd -W)",
+      "Bash(cmd //c 'templx-lite\\\\unpack.bat' '__TRACKED_VAR__\\\\coreNormal.dotm')",
+      "Bash(cmd //c 'templx-lite\\\\unpack.bat' '__TRACKED_VAR__\\\\Book.xltx')",
+      "Bash(cmd //c 'templx-lite\\\\pack.bat' '__TRACKED_VAR__\\\\coreNormal.dotm_unpacked')",
+      "Bash(cmd //c 'templx-lite\\\\pack.bat' '__TRACKED_VAR__\\\\Book.xltx_unpacked')",
+      "Bash(rm -rf tmp/thx2)",
+      "Bash(mkdir -p tmp/thx2)",
+      "Bash(cp resources/defaults/defaultThemes/Facet.thmx tmp/thx2/Facet.thmx)",
+      "Bash(unzip -p Facet.thmx '\\\\[Content_Types\\\\].xml')",
+      "Bash(rm -rf tmp/thx3)",
+      "Bash(mkdir -p tmp/thx3)",
+      "Bash(cp resources/defaults/defaultThemes/Facet.thmx tmp/thx3/Facet.thmx)",
+      "Bash(cmd //c '__TRACKED_VAR__\\\\unpack.bat' '__TRACKED_VAR__\\\\coreNormal.dotm')",
+      "Bash(cmd //c 'templx-lite\\\\pack.bat' '__TRACKED_VAR__\\\\random_folder')",
+      "Bash(unzip -t tmp/grd2/coreNormal_packed.dotm)",
+      "Bash(set -e)",
+      "Bash(git reset *)",
+      "Bash(git restore *)"
+    ],
+    "additionalDirectories": [
+      "C:\\code\\templx\\tmp\\templx-lite-test"
+    ]
+  }
+}
